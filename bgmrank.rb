@@ -1,7 +1,11 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
+require 'bundler/setup'
+
 require 'optparse'
 require 'net/http'
+require 'nokogiri'
 
 CATEGORIES = [:anime, :book, :music, :game, :real]
 STATES = [:wish, :collect, :do, :on_hold, :dropped]
@@ -66,14 +70,19 @@ Net::HTTP.start 'bgm.tv' do |http|
       $stderr.print "fetching page ##{i}... " if progress
 
       content = http.request_get(url).body
-      count = content.scan(/<p class="collectInfo">/).length
-      $stderr.puts count.to_s if progress
-      total += count
-      content.scan(/<span class="sstars(\d+) starsinfo">/) do |stars, |
-        ranks[stars.to_i] += 1
+      doc = Nokogiri::HTML(content)
+      items = doc.css('#browserItemList>li')
+      items.each do |item|
+        starsinfo = item.css('.starsinfo').first
+        if starsinfo
+          score = starsinfo[:class].split[0][6..-1].to_i
+          ranks[score] += 1
+        end
       end
+      $stderr.puts items.size if progress
+      total += items.size
 
-      break if count < 24
+      break if items.size < 24
     end
   end
 end
