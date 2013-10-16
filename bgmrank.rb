@@ -15,6 +15,7 @@ options = {
   :category => [:anime],
   :state => [:collect],
   :tags => false,
+  :min_num => 1,
   :width => 70,
 }
 OptionParser.new do |opts|
@@ -44,6 +45,10 @@ OptionParser.new do |opts|
   end
   opts.on("-t", "--[no-]tags", "Stats score of tags") do |t|
     options[:tags] = t
+  end
+  opts.on("-m", "--min-number N", Integer,
+          "Only show tags with at least N items ranked") do |m|
+    options[:min_num] = m
   end
 
   opts.separator ""
@@ -132,10 +137,12 @@ tags.map do |tag, info|
 end.sort do |a, b|
   info_key(b) <=> info_key(a)
 end.each do |info|
-  line = "%.2f " % info[:avg_rank]
-  line << "#{info[:tag]}: "
-  line << "#{info[:ranked]}/#{info[:total]} "
-  puts line
+  if info[:ranked] >= options[:min_num]
+    line = "%.2f " % info[:avg_rank]
+    line << "#{info[:tag]}: "
+    line << "#{info[:ranked]}/#{info[:total]} "
+    puts line
+  end
 end if options[:tags]
 puts if options[:tags]
 
