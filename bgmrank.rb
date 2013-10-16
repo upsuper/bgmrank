@@ -6,6 +6,7 @@ require 'bundler/setup'
 require 'optparse'
 require 'net/http'
 require 'nokogiri'
+require 'insensitive_hash'
 
 CATEGORIES = [:anime, :book, :music, :game, :real]
 STATES = [:wish, :collect, :do, :on_hold, :dropped]
@@ -74,7 +75,7 @@ bgm_id = ARGV[0]
 total = 0
 ranks = Array.new(11, 0)
 if options[:tags]
-  tags = Hash.new do |h, k|
+  tags = InsensitiveHash.new do |h, k|
     h[k] = {:total => 0, :ranks => Array.new(11, 0)}
   end
 end
@@ -141,7 +142,7 @@ end.each do |info|
   if info[:ranked] >= options[:min_num]
     line = "%.2f " % info[:avg_rank]
     line << "#{info[:tag]}: "
-    line << "#{info[:ranked]}/#{info[:total]} "
+    line << "#{info[:ranked]}/#{info[:total]}"
     puts line
   end
 end if options[:tags]
