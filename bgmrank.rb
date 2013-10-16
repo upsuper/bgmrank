@@ -20,6 +20,7 @@ options = {
 }
 OptionParser.new do |opts|
   opts.banner = "Usage: bgmrank.rb [options] username"
+  opts.summary_width = 25
 
   def map_check!(list, set)
     list = list.map do |i|
@@ -36,18 +37,18 @@ OptionParser.new do |opts|
   opts.separator ""
   opts.separator "Stats options:"
   opts.on("-c", "--category CAT,...", Array,
-          "Select category (#{CATEGORIES.join ', '})") do |list|
+          "Categories (#{CATEGORIES.join ', '})") do |list|
     options[:category] = map_check!(list, CATEGORIES)
   end
   opts.on("-s", "--state STATE,...", Array,
-          "Select state (#{STATES.join ', '})") do |list|
+          "States (#{STATES.join ', '})") do |list|
     options[:state] = map_check!(list, STATES)
   end
   opts.on("-t", "--[no-]tags", "Stats score of tags") do |t|
     options[:tags] = t
   end
   opts.on("-m", "--min-number N", Integer,
-          "Only show tags with at least N items ranked") do |m|
+          "Only show tags with at least N ranked") do |m|
     options[:min_num] = m
   end
 
