@@ -34,11 +34,11 @@ OptionParser.new do |opts|
 
   opts.separator ""
   opts.separator "Stats options:"
-  opts.on("-c CAT", "--category CAT", Array,
+  opts.on("-c", "--category CAT,...", Array,
           "Select category (#{CATEGORIES.join ', '})") do |list|
     options[:category] = map_check!(list, CATEGORIES)
   end
-  opts.on("-s STATE", "--state STATE", Array,
+  opts.on("-s", "--state STATE,...", Array,
           "Select state (#{STATES.join ', '})") do |list|
     options[:state] = map_check!(list, STATES)
   end
@@ -51,7 +51,7 @@ OptionParser.new do |opts|
   opts.on("-p", "--[no-]progress", "Display progress") do |p|
     progress = p
   end
-  opts.on("-w WIDTH", "--max-width WIDTH", Integer, "Max output width") do |w|
+  opts.on("-w", "--max-width WIDTH", Integer, "Max output width") do |w|
     options[:width] = w
   end
 
