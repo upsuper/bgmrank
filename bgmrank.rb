@@ -21,7 +21,10 @@ OptionParser.new do |opts|
   opts.banner = "Usage: bgmrank.rb [options] username"
 
   def map_check!(list, set)
-    list.map! { |i| i.to_sym }
+    list = list.map do |i|
+      sym = i.to_sym
+      if sym == :all; set; else; sym end
+    end.flatten.uniq
     if list.any? { |i| !set.include?(i) }
       raise OptionParser::InvalidArgument
     else
