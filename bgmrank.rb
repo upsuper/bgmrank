@@ -96,13 +96,13 @@ Net::HTTP.start 'bgm.tv' do |http|
         score = if starsinfo
                   starsinfo[:class].split[0][6..-1].to_i
                 else; 0 end
-        ranks[score] += 1 if score > 0
+        ranks[score] += 1
         if options[:tags]
           taginfo = item.css('.collectInfo>.tip').first
           if taginfo
             taginfo.content.split[1..-1].each do |tag|
               tags[tag][:total] += 1
-              tags[tag][:ranks][score] += 1 if score > 0
+              tags[tag][:ranks][score] += 1
             end
           end
         end
@@ -117,7 +117,7 @@ end
 $stderr.puts if progress
 
 def stat_ranks(ranks)
-  ranked = ranks.inject(:+)
+  ranked = ranks.drop(1).inject(:+)
   sum = ranks.each_with_index.inject(0) do |sum, (count, rank)|
     sum + count * rank
   end
@@ -136,11 +136,12 @@ end.sort_by do |info|
   [nan_to_ninf(info[:avg_rank]), info[:ranked], info[:total]]
 end.reverse.each do |info|
   if info[:ranked] >= options[:min_num]
-    var = info[:ranks].each_with_index.inject(0) do |sum, (count, rank)|
-      rank == 0 ? sum : sum + count * (rank - info[:avg_rank]) ** 2
-    end / info[:ranked]
+    var = info[:ranks].each_with_index
+      .drop(1).inject(0) do |sum, (count, rank)|
+        sum + count * (rank - info[:avg_rank])**2
+      end / info[:ranked]
     stdev = Math.sqrt(var)
-    line = "%.2f±%.2f " % [info[:avg_rank], stdev]
+    line = format("%.2f±%.2f ", info[:avg_rank], stdev)
     line << "#{info[:tag]}: "
     line << "#{info[:ranked]}/#{info[:total]}"
     puts line
@@ -148,7 +149,7 @@ end.reverse.each do |info|
 end if options[:tags]
 puts if options[:tags]
 
-max_num = [ranks.max.to_f, 1].max
+max_num = [ranks.drop(1).max.to_f, 1].max
 max_len = options[:width] - max_num.to_s.length - 5
 max_len = max_num if max_num < max_len
 
