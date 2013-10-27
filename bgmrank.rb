@@ -128,19 +128,19 @@ def nan_to_ninf(f)
   f.nan? ? -Float::INFINITY : f
 end
 
-def info_key(info)
-  [nan_to_ninf(info[:avg_rank]), info[:ranked], info[:total]]
-end
-
 tags.map do |tag, info|
   ranked, avg_rank = stat_ranks(info[:ranks])
   {:tag => tag, :total => info[:total], :ranks => info[:ranks],
    :ranked => ranked, :avg_rank => avg_rank}
-end.sort do |a, b|
-  info_key(b) <=> info_key(a)
-end.each do |info|
+end.sort_by do |info|
+  [nan_to_ninf(info[:avg_rank]), info[:ranked], info[:total]]
+end.reverse.each do |info|
   if info[:ranked] >= options[:min_num]
-    line = "%.2f " % info[:avg_rank]
+    var = info[:ranks].each_with_index.inject(0) do |sum, (count, rank)|
+      rank == 0 ? sum : sum + count * (rank - info[:avg_rank]) ** 2
+    end / info[:ranked]
+    stdev = Math.sqrt(var)
+    line = "%.2f±%.2f " % [info[:avg_rank], stdev]
     line << "#{info[:tag]}: "
     line << "#{info[:ranked]}/#{info[:total]}"
     puts line
