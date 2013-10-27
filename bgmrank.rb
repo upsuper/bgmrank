@@ -75,7 +75,7 @@ bgm_id = ARGV[0]
 total = 0
 ranks = Array.new(11, 0)
 tags = InsensitiveHash.new do |h, k|
-  h[k] = {:total => 0, :ranks => Array.new(11, 0)}
+  h[k] = Array.new(11, 0)
 end
 
 Net::HTTP.start 'bgm.tv' do |http|
@@ -98,8 +98,7 @@ Net::HTTP.start 'bgm.tv' do |http|
         taginfo = item.css('.collectInfo>.tip').first
         if taginfo
           taginfo.content.split[1..-1].each do |tag|
-            tags[tag][:total] += 1
-            tags[tag][:ranks][score] += 1
+            tags[tag][score] += 1
           end
         end
       end
@@ -124,9 +123,9 @@ def nan_to_ninf(f)
   f.nan? ? -Float::INFINITY : f
 end
 
-tags.map do |tag, info|
-  ranked, avg_rank = stat_ranks(info[:ranks])
-  {:tag => tag, :total => info[:total], :ranks => info[:ranks],
+tags.map do |tag, ranks|
+  ranked, avg_rank = stat_ranks(ranks)
+  {:tag => tag, :total => ranks.inject(:+), :ranks => ranks,
    :ranked => ranked, :avg_rank => avg_rank}
 end.sort_by do |info|
   [nan_to_ninf(info[:avg_rank]), info[:ranked], info[:total]]
