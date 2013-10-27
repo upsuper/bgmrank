@@ -45,13 +45,6 @@ OptionParser.new do |opts|
           "States (#{STATES.join ', '})") do |list|
     options[:state] = map_check!(list, STATES)
   end
-  opts.on("-t", "--[no-]tags", "Stats score of tags") do |t|
-    options[:tags] = t
-  end
-  opts.on("-m", "--min-number N", Integer,
-          "Only show tags with at least N ranked") do |m|
-    options[:min_num] = m
-  end
 
   opts.separator ""
   opts.separator "Display options:"
@@ -60,6 +53,13 @@ OptionParser.new do |opts|
   end
   opts.on("-w", "--max-width WIDTH", Integer, "Max output width") do |w|
     options[:width] = w
+  end
+  opts.on("-t", "--[no-]tags", "Show stats of tags") do |t|
+    options[:tags] = t
+  end
+  opts.on("-m", "--min-number N", Integer,
+          "Only show tags with at least N ranked") do |m|
+    options[:min_num] = m
   end
 
   opts.separator ""
@@ -74,10 +74,8 @@ bgm_id = ARGV[0]
 
 total = 0
 ranks = Array.new(11, 0)
-if options[:tags]
-  tags = InsensitiveHash.new do |h, k|
-    h[k] = {:total => 0, :ranks => Array.new(11, 0)}
-  end
+tags = InsensitiveHash.new do |h, k|
+  h[k] = {:total => 0, :ranks => Array.new(11, 0)}
 end
 
 Net::HTTP.start 'bgm.tv' do |http|
@@ -97,13 +95,11 @@ Net::HTTP.start 'bgm.tv' do |http|
                   starsinfo[:class].split[0][6..-1].to_i
                 else; 0 end
         ranks[score] += 1
-        if options[:tags]
-          taginfo = item.css('.collectInfo>.tip').first
-          if taginfo
-            taginfo.content.split[1..-1].each do |tag|
-              tags[tag][:total] += 1
-              tags[tag][:ranks][score] += 1
-            end
+        taginfo = item.css('.collectInfo>.tip').first
+        if taginfo
+          taginfo.content.split[1..-1].each do |tag|
+            tags[tag][:total] += 1
+            tags[tag][:ranks][score] += 1
           end
         end
       end
