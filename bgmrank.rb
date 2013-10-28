@@ -19,6 +19,7 @@ options = {
   :tags => true,
   :min_num => 1,
   :width => 70,
+  :data_file => nil,
 }
 OptionParser.new do |opts|
   opts.banner = "Usage: bgmrank.rb [options] username"
@@ -45,6 +46,9 @@ OptionParser.new do |opts|
   opts.on("-s", "--state STATE,...", Array,
           "States (#{STATES.join ', '})") do |list|
     options[:state] = map_check!(list, STATES)
+  end
+  opts.on("-d", "--data FILE", String, "Output rank data to file") do |d|
+    options[:data_file] = d
   end
 
   opts.separator ""
@@ -137,7 +141,7 @@ tags.each do |k, v|
   merged_tags[k] = r
 end
 
-merged_tags.map do |tag, ranks|
+merged_tags = merged_tags.map do |tag, ranks|
   ranked, avg_rank = stat_ranks(ranks)
   var = ranks.each_with_index
     .drop(1).inject(0) do |sum, (count, rank)|
@@ -150,7 +154,9 @@ end.sort_by do |info|
   [nan_to_ninf(info[:avg_rank]),
    nan_to_ninf(-info[:stdev]),
    info[:ranked], info[:total]]
-end.reverse.each do |info|
+end.reverse
+
+merged_tags.each do |info|
   if info[:ranked] >= options[:min_num]
     line = format("%.2f±%.2f ", info[:avg_rank], info[:stdev])
     line << "#{info[:tag]}: "
@@ -159,6 +165,16 @@ end.reverse.each do |info|
   end
 end if options[:tags]
 puts if options[:tags]
+
+File.open(options[:data_file], "w") do |f|
+  write_line = proc do |tag, ranks|
+    f.write "#{tag.inspect}, #{ranks.join(", ")}\n"
+  end
+  write_line.call "", ranks
+  merged_tags.each do |info|
+    write_line.call info[:tag], info[:ranks]
+  end
+end if !options[:data_file].nil?
 
 max_num = [ranks.drop(1).max.to_f, 1].max
 max_len = options[:width] - max_num.to_s.length - 5
