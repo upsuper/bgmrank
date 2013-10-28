@@ -139,18 +139,20 @@ end
 
 merged_tags.map do |tag, ranks|
   ranked, avg_rank = stat_ranks(ranks)
+  var = ranks.each_with_index
+    .drop(1).inject(0) do |sum, (count, rank)|
+      sum + count * (rank - avg_rank)**2
+    end / ranked
+  stdev = Math.sqrt(var)
   {:tag => tag, :total => ranks.inject(:+), :ranks => ranks,
-   :ranked => ranked, :avg_rank => avg_rank}
+   :ranked => ranked, :avg_rank => avg_rank, :stdev => stdev}
 end.sort_by do |info|
-  [nan_to_ninf(info[:avg_rank]), info[:ranked], info[:total]]
+  [nan_to_ninf(info[:avg_rank]),
+   nan_to_ninf(-info[:stdev]),
+   info[:ranked], info[:total]]
 end.reverse.each do |info|
   if info[:ranked] >= options[:min_num]
-    var = info[:ranks].each_with_index
-      .drop(1).inject(0) do |sum, (count, rank)|
-        sum + count * (rank - info[:avg_rank])**2
-      end / info[:ranked]
-    stdev = Math.sqrt(var)
-    line = format("%.2f±%.2f ", info[:avg_rank], stdev)
+    line = format("%.2f±%.2f ", info[:avg_rank], info[:stdev])
     line << "#{info[:tag]}: "
     line << "#{info[:ranked]}/#{info[:total]}"
     puts line
