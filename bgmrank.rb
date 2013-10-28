@@ -7,6 +7,7 @@ require 'optparse'
 require 'net/http'
 require 'nokogiri'
 require 'insensitive_hash'
+require 'chinese_convt'
 
 CATEGORIES = [:anime, :book, :music, :game, :real]
 STATES = [:wish, :collect, :do, :on_hold, :dropped]
@@ -15,7 +16,7 @@ progress = true
 options = {
   :category => [:anime],
   :state => [:collect],
-  :tags => false,
+  :tags => true,
   :min_num => 1,
   :width => 70,
 }
@@ -74,7 +75,7 @@ bgm_id = ARGV[0]
 
 total = 0
 ranks = Array.new(11, 0)
-tags = InsensitiveHash.new do |h, k|
+tags = Hash.new do |h, k|
   h[k] = Array.new(11, 0)
 end
 
@@ -123,7 +124,20 @@ def nan_to_ninf(f)
   f.nan? ? -Float::INFINITY : f
 end
 
-tags.map do |tag, ranks|
+tagkeys_orig = tags.keys
+tagkeys_trans = Chinese.zh2sim(tagkeys_orig.join(' ')).downcase.split(' ')
+tagkeys = Hash[tagkeys_orig.zip(tagkeys_trans)]
+merged_tags = InsensitiveHash.new do |h, k|
+  h[k] = Array.new(11, 0)
+end
+merged_tags.encoder = proc { |key| tagkeys[key] }
+tags.each do |k, v|
+  r = merged_tags[k]
+  r = r.zip(v).map { |old, new| old + new }
+  merged_tags[k] = r
+end
+
+merged_tags.map do |tag, ranks|
   ranked, avg_rank = stat_ranks(ranks)
   {:tag => tag, :total => ranks.inject(:+), :ranks => ranks,
    :ranked => ranked, :avg_rank => avg_rank}
