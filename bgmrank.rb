@@ -16,7 +16,6 @@ progress = true
 options = {
   :category => [:anime],
   :state => [:collect],
-  :tags => true,
   :min_num => 1,
   :width => 70,
   :data_file => nil,
@@ -58,9 +57,6 @@ OptionParser.new do |opts|
   end
   opts.on("-w", "--max-width WIDTH", Integer, "Max output width") do |w|
     options[:width] = w
-  end
-  opts.on("-t", "--[no-]tags", "Show stats of tags") do |t|
-    options[:tags] = t
   end
   opts.on("-m", "--min-number N", Integer,
           "Only show tags with at least N ranked") do |m|
@@ -163,8 +159,8 @@ merged_tags.each do |info|
     line << "#{info[:ranked]}/#{info[:total]}"
     puts line
   end
-end if options[:tags]
-puts if options[:tags]
+end
+puts
 
 File.open(options[:data_file], "w") do |f|
   write_line = proc do |tag, ranks|
