@@ -9,6 +9,8 @@ require 'nokogiri'
 require 'insensitive_hash'
 require 'chinese_convt'
 
+require './tag_expr'
+
 CATEGORIES = [:anime, :book, :music, :game, :real]
 STATES = [:wish, :collect, :do, :on_hold, :dropped]
 
@@ -21,7 +23,7 @@ options = {
   :data_file => nil,
 }
 opts = OptionParser.new do |opts|
-  opts.banner = "Usage: bgmrank.rb [options] username"
+  opts.banner = "Usage: bgmrank.rb [options] username [condition]"
   opts.summary_width = 25
 
   def map_check!(list, set)
@@ -76,7 +78,8 @@ if ARGV.length < 1
   puts opts
   exit 1
 end
-bgm_id = ARGV[0]
+bgm_id = ARGV.shift
+cond = TagExpr.parse ARGV.join(' ').downcase
 
 total = 0
 ranks = Array.new(11, 0)
@@ -96,20 +99,23 @@ Net::HTTP.start 'bgm.tv' do |http|
       doc = Nokogiri::HTML(content)
       items = doc.css('#browserItemList>li')
       items.each do |item|
-        starsinfo = item.css('.starsinfo').first
-        score = if starsinfo
-                  starsinfo[:class].split[0][6..-1].to_i
-                else; 0 end
-        ranks[score] += 1
         taginfo = item.css('.collectInfo>.tip').first
-        if taginfo
-          taginfo.content.split[1..-1].each do |tag|
+        taginfo = if taginfo
+                    taginfo.content.split[1..-1]
+                  else; [] end
+        if cond.verify Set.new(taginfo.map { |tag| tag.downcase })
+          starsinfo = item.css('.starsinfo').first
+          score = if starsinfo
+                    starsinfo[:class].split[0][6..-1].to_i
+                  else; 0 end
+          ranks[score] += 1
+          total += 1
+          taginfo.each do |tag|
             tags[tag][score] += 1
           end
         end
       end
       $stderr.puts items.size if progress
-      total += items.size
 
       break if items.size < 24
     end
