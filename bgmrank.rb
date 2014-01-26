@@ -20,7 +20,7 @@ options = {
   :width => 70,
   :data_file => nil,
 }
-OptionParser.new do |opts|
+opts = OptionParser.new do |opts|
   opts.banner = "Usage: bgmrank.rb [options] username"
   opts.summary_width = 25
 
@@ -69,8 +69,13 @@ OptionParser.new do |opts|
     puts opts
     exit
   end
-end.parse!
+end
+opts.parse!
 
+if ARGV.length < 1
+  puts opts
+  exit 1
+end
 bgm_id = ARGV[0]
 
 total = 0
