@@ -40,8 +40,7 @@ class TagExpr
         seq << TagExpr.new(nil, [token])
       end
       if seq.last.is_a?(TagExpr) and seq[-2] == '!'
-        expr = TagExpr.new '!', [seq.pop]
-        seq[-1] = expr
+        seq[-1] = TagExpr.new '!', [seq.pop]
       end
     end
     raise if seq.length != 1
@@ -55,16 +54,11 @@ class TagExpr
 
   def verify(tags)
     case @operator
-    when nil
-      tags.include? @operands[0]
-    when '!'
-      not @operands[0].verify tags
-    when '&'
-      @operands.all? { |expr| expr.verify tags }
-    when '|'
-      @operands.any? { |expr| expr.verify tags }
-    else
-      false
+    when nil; tags.include? @operands[0]
+    when '!'; not @operands[0].verify tags
+    when '&'; @operands.all? { |expr| expr.verify tags }
+    when '|'; @operands.any? { |expr| expr.verify tags }
+    else    ; false
     end
   end
 end
