@@ -1,5 +1,6 @@
 class TagExpr
   def self.parse(expr)
+    return TagExpr.new('t', []) if expr.empty?
     seq = []
     stack = []
     "(#{expr})".scan(/\(|\)|!|\||[^\s\(\)!\|]+/) do |token|
@@ -58,6 +59,7 @@ class TagExpr
     when '!'; not @operands[0].verify tags
     when '&'; @operands.all? { |expr| expr.verify tags }
     when '|'; @operands.any? { |expr| expr.verify tags }
+    when 't'; true
     else    ; false
     end
   end
