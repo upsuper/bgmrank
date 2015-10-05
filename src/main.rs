@@ -5,12 +5,14 @@ extern crate kuchiki;
 extern crate selectors;
 #[macro_use] extern crate string_cache;
 
+mod classifier;
 mod data;
 mod init;
 mod helpers;
 mod parser;
 mod stats;
 
+use std::cmp::PartialOrd;
 use hyper::client::Client;
 use kuchiki::Html;
 
@@ -55,6 +57,40 @@ fn get_all_items(args: &init::Args) -> Vec<Item> {
     result
 }
 
+struct TagStats {
+    tag: String,
+    avg: f32,
+    stdev: f32,
+    rated: usize,
+    total: usize
+}
+
+fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
+    let mut result: Vec<TagStats> = classifier::classify_by_tags(all_items)
+        .into_iter().filter_map(|(tag, items)| {
+            let total = items.len();
+            let hist = stats::get_histogram(items.into_iter());
+            let (avg, stdev) = hist.get_avg_and_stdev();
+            if avg.is_nan() || stdev.is_nan() {
+                return None;
+            }
+            Some(TagStats {
+                tag: tag,
+                avg: avg,
+                stdev: stdev,
+                rated: hist.get_all_rated(),
+                total: total
+            })
+        }).collect();
+    result.sort_by(|l, r| {
+        (l.avg, -l.stdev).partial_cmp(&(r.avg, -r.stdev))
+            // It should be safe to unwrap here because we should have
+            // filtered out all NaNs in the loop above.
+            .unwrap().reverse()
+    });
+    result
+}
+
 fn generate_bar(width: usize) -> String {
     std::iter::repeat('#').take(width).collect()
 }
@@ -65,6 +101,12 @@ fn main() {
     let args = init::handle_opts();
     let all_items = get_all_items(&args);
     let hist = stats::get_histogram(all_items.iter());
+
+    for tag_stats in generate_tag_stats(&all_items) {
+        println!("{:.2}±{:.2} {}: {}/{}", tag_stats.avg, tag_stats.stdev,
+                 tag_stats.tag, tag_stats.rated, tag_stats.total);
+    }
+    println!("");
 
     let (_, max_rated) = hist.get_max_rated();
     for rating in 1..(MAX_RATING + 1) {
