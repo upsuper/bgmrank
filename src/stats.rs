@@ -1,15 +1,47 @@
+use std::cmp::{PartialOrd, Ordering};
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use std::iter::FromIterator;
 use std::ops::{Index, IndexMut};
+
 use data::{Rating, Item, MAX_RATING};
+
+#[derive(PartialEq)]
+pub struct Interval {
+    pub avg: f32,
+    pub stdev: f32
+}
+
+impl Interval {
+    pub fn is_nan(&self) -> bool {
+        assert!(self.avg.is_nan() == self.stdev.is_nan());
+        self.avg.is_nan()
+    }
+}
+
+impl PartialOrd for Interval {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        (self.avg, -self.stdev).partial_cmp(&(other.avg, -other.stdev))
+    }
+}
+
+impl Display for Interval {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{:.2}±{:.2}", self.avg, self.stdev)
+    }
+}
+
+pub struct Stats {
+    pub total: usize,
+    pub rated: usize,
+    pub rating: Interval
+}
 
 pub struct Histogram {
     ratings: [usize; MAX_RATING as usize + 1]
 }
 
 impl Histogram {
-    pub fn get_all_rated(&self) -> usize {
-        self.ratings.iter().skip(1).fold(0, |acc, &item| acc + item)
-    }
     pub fn get_max_rated(&self) -> (Rating, usize) {
         self.ratings.iter().enumerate().skip(1)
             .fold((0, 0), |(cur_rating, cur_max), (rating, &num)| {
@@ -20,20 +52,21 @@ impl Histogram {
                 }
             })
     }
-    fn get_avg_and_count(&self) -> (f32, usize) {
-        let (count, sum) = self.ratings.iter().enumerate().skip(1)
+    pub fn get_stats(&self) -> Stats {
+        let (rated, sum) = self.ratings.iter().enumerate().skip(1)
             .fold((0, 0), |(count, sum), (rating, &num)| {
                 (count + num, sum + (rating as usize * num))
             });
-        (sum as f32 / count as f32, count)
-    }
-    pub fn get_avg_and_stdev(&self) -> (f32, f32) {
-        let (avg, count) = self.get_avg_and_count();
+        let avg = sum as f32 / rated as f32;
         let var = self.ratings.iter().enumerate().skip(1)
             .fold(0f32, |sum, (rating, &num)| {
                 sum + num as f32 * (rating as f32 - avg).powf(2.0)
-            }) / count as f32;
-        (avg, var.sqrt())
+            }) / rated as f32;
+        Stats {
+            total: rated + self.ratings[0],
+            rated: rated,
+            rating: Interval { avg: avg, stdev: var.sqrt() }
+        }
     }
 }
 

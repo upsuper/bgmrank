@@ -17,7 +17,7 @@ use hyper::client::Client;
 use kuchiki::Html;
 
 use data::{ToStaticStr, Category, State, Item, MAX_RATING};
-use stats::Histogram;
+use stats::{Stats, Histogram};
 
 const ITEMS_PER_PAGE: usize = 24;
 
@@ -60,34 +60,26 @@ fn get_all_items(args: &init::Args) -> Vec<Item> {
 
 struct TagStats {
     tag: String,
-    avg: f32,
-    stdev: f32,
-    rated: usize,
-    total: usize
+    stats: Stats
 }
 
 fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
     let mut result: Vec<TagStats> = classifier::classify_by_tags(all_items)
         .into_iter().filter_map(|(tag, items)| {
-            let total = items.len();
             let hist: Histogram = items.into_iter().collect();
-            let (avg, stdev) = hist.get_avg_and_stdev();
-            if avg.is_nan() || stdev.is_nan() {
+            let stats = hist.get_stats();
+            if stats.rating.is_nan() {
                 return None;
             }
             Some(TagStats {
                 tag: tag,
-                avg: avg,
-                stdev: stdev,
-                rated: hist.get_all_rated(),
-                total: total
+                stats: stats
             })
         }).collect();
     result.sort_by(|l, r| {
-        (l.avg, -l.stdev).partial_cmp(&(r.avg, -r.stdev))
-            // It should be safe to unwrap here because we should have
-            // filtered out all NaNs in the loop above.
-            .unwrap().reverse()
+        // It should be safe to unwrap here because we should have
+        // filtered out all NaNs in the loop above.
+        l.stats.rating.partial_cmp(&r.stats.rating).unwrap()
     });
     result
 }
@@ -104,12 +96,13 @@ fn main() {
     let hist: Histogram = all_items.iter().collect();
 
     for tag_stats in generate_tag_stats(&all_items) {
-        println!("{:.2}±{:.2} {}: {}/{}", tag_stats.avg, tag_stats.stdev,
-                 tag_stats.tag, tag_stats.rated, tag_stats.total);
+        println!("{} {}: {}/{}", tag_stats.stats.rating,
+                 tag_stats.tag, tag_stats.stats.rated, tag_stats.stats.total);
     }
     println!("");
 
     let (_, max_rated) = hist.get_max_rated();
+    let stats = hist.get_stats();
     for rating in 1..(MAX_RATING + 1) {
         let rated = hist[Some(rating)];
         let num = (rated as f32 / max_rated as f32 *
@@ -117,7 +110,6 @@ fn main() {
         let bar = generate_bar(num) + if num > 0 { " " } else { "" };
         println!("{:>2}: {}{}", rating, bar, rated);
     }
-    println!("rated: {}/{}", hist.get_all_rated(), all_items.len());
-    let (avg, stdev) = hist.get_avg_and_stdev();
-    println!("rating: {:.2}±{:.2}", avg, stdev);
+    println!("rated: {}/{}", stats.rated, stats.total);
+    println!("rating: {}", stats.rating);
 }
