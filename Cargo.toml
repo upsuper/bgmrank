@@ -1,0 +1,12 @@
+[package]
+name = "bgmrank"
+version = "0.1.0"
+authors = ["Xidorn Quan <quanxunzhen@gmail.com>"]
+
+[dependencies]
+getopts = "0.2"
+hyper = "0.6"
+enum-set = "0.0.5"
+kuchiki = { git = "https://github.com/SimonSapin/kuchiki.git" }
+selectors = { git = "https://github.com/servo/rust-selectors" }
+string_cache = "0.1"
