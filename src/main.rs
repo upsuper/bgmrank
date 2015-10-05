@@ -17,6 +17,7 @@ use hyper::client::Client;
 use kuchiki::Html;
 
 use data::{ToStaticStr, Category, State, Item, MAX_RATING};
+use stats::Histogram;
 
 const ITEMS_PER_PAGE: usize = 24;
 
@@ -69,7 +70,7 @@ fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
     let mut result: Vec<TagStats> = classifier::classify_by_tags(all_items)
         .into_iter().filter_map(|(tag, items)| {
             let total = items.len();
-            let hist = stats::get_histogram(items.into_iter());
+            let hist: Histogram = items.into_iter().collect();
             let (avg, stdev) = hist.get_avg_and_stdev();
             if avg.is_nan() || stdev.is_nan() {
                 return None;
@@ -100,7 +101,7 @@ const MAX_COL_WIDTH: usize = 70;
 fn main() {
     let args = init::handle_opts();
     let all_items = get_all_items(&args);
-    let hist = stats::get_histogram(all_items.iter());
+    let hist: Histogram = all_items.iter().collect();
 
     for tag_stats in generate_tag_stats(&all_items) {
         println!("{:.2}±{:.2} {}: {}/{}", tag_stats.avg, tag_stats.stdev,

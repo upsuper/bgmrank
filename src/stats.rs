@@ -1,3 +1,4 @@
+use std::iter::FromIterator;
 use std::ops::{Index, IndexMut};
 use data::{Rating, Item, MAX_RATING};
 
@@ -36,6 +37,17 @@ impl Histogram {
     }
 }
 
+impl<'a> FromIterator<&'a Item> for Histogram {
+    fn from_iter<Iter>(iter: Iter) -> Self
+            where Iter: IntoIterator<Item=&'a Item> {
+        let mut result = Histogram { ratings: [0; MAX_RATING as usize + 1] };
+        for item in iter {
+            result[item.rating] += 1;
+        }
+        result
+    }
+}
+
 impl Index<Option<Rating>> for Histogram {
     type Output = usize;
     fn index<'a>(&'a self, rating: Option<Rating>) -> &'a Self::Output {
@@ -54,13 +66,4 @@ impl IndexMut<Option<Rating>> for Histogram {
             None => &mut self.ratings[0]
         }
     }
-}
-
-pub fn get_histogram<'a, Iter>(iter: Iter) -> Histogram 
-        where Iter: Iterator<Item=&'a Item> {
-    let mut result = Histogram { ratings: [0; MAX_RATING as usize + 1] };
-    for item in iter {
-        result[item.rating] += 1;
-    }
-    result
 }
