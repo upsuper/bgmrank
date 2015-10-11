@@ -79,7 +79,7 @@ fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
     result.sort_by(|l, r| {
         // It should be safe to unwrap here because we should have
         // filtered out all NaNs in the loop above.
-        l.stats.rating.partial_cmp(&r.stats.rating).unwrap()
+        l.stats.rating.partial_cmp(&r.stats.rating).unwrap().reverse()
     });
     result
 }
