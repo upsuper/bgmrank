@@ -7,7 +7,7 @@ pub trait ToStaticStr {
     fn to_static_str(&self) -> &'static str;
 }
 
-pub trait ListAll {
+pub trait ListAll : Sized {
     fn list_all() -> &'static [Self];
 }
 
