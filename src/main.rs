@@ -1,6 +1,5 @@
 extern crate enum_set;
 extern crate getopts;
-extern crate hyper;
 extern crate kuchiki;
 extern crate selectors;
 #[macro_use] extern crate string_cache;
@@ -13,8 +12,7 @@ mod parser;
 mod stats;
 
 use std::cmp::PartialOrd;
-use hyper::client::Client;
-use kuchiki::Html;
+use kuchiki::traits::ParserExt;
 
 use data::{ToStaticStr, Category, State, Item, MAX_RATING};
 use stats::{Stats, Histogram};
@@ -24,20 +22,14 @@ const ITEMS_PER_PAGE: usize = 24;
 fn get_items(username: &str, category: Category, state: State) -> Vec<Item> {
     let category_str = category.to_static_str();
     let state_str = state.to_static_str();
-    let client = Client::new();
     let mut result = vec![];
     println!("fetching {}: {}/{}", username, category_str, state_str);
     for page in 1.. {
         println!("  fetching page {}...", page);
         let url = format!("https://bgm.tv/{}/list/{}/{}?page={}",
                           category_str, username, state_str, page);
-        let mut res = client.get(&url).send().unwrap();
-        if res.status != hyper::Ok {
-            println!("Failed to fetch {}: {}", url, res.status);
-            std::process::exit(1);
-        }
-        let html = Html::from_stream(&mut res).unwrap();
-        let items = parser::get_all_items(html);
+        let doc = kuchiki::parse_html().from_http(&url).unwrap();
+        let items = parser::get_all_items(doc);
         let count = items.len();
         result.extend(items);
         if count < ITEMS_PER_PAGE {

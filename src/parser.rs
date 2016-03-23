@@ -1,5 +1,5 @@
-use kuchiki::Html;
 use selectors::Element;
+use kuchiki::NodeRef;
 
 use data::{Id, Rating, Item};
 use helpers::{ElementDataRef, QuerySelector};
@@ -7,15 +7,15 @@ use helpers::{ElementDataRef, QuerySelector};
 fn get_item_id(elem: &ElementDataRef) -> Id {
     static ID_PREFIX: &'static str = "item_";
     let id = elem.get_id().unwrap();
-    let id_str = id.as_slice();
-    assert!(id_str.starts_with(ID_PREFIX));
-    id_str[ID_PREFIX.len()..].parse().unwrap()
+    let (prefix, id_str) = id.split_at(ID_PREFIX.len());
+    assert!(prefix == ID_PREFIX);
+    id_str.parse().unwrap()
 }
 
 fn get_item_title(elem: &ElementDataRef) -> String {
     let title_node = elem.query_selector("h3>*:last-child").unwrap();
-    assert!(title_node.name == qualname!(html, small) ||
-            title_node.name == qualname!(html, a));
+    assert!(title_node.name == qualname!(html, "small") ||
+            title_node.name == qualname!(html, "a"));
     title_node.text_contents()
 }
 
@@ -24,9 +24,9 @@ fn get_item_rating(elem: &ElementDataRef) -> Option<Rating> {
     elem.query_selector(".starsinfo").map(|e| {
         let mut result = None;
         e.each_class(|class| {
-            let class_str = class.as_slice();
-            if class_str.starts_with(STARS_PREFIX) {
-                let rating = class_str[STARS_PREFIX.len()..].parse().unwrap();
+            let (prefix, class_str) = class.split_at(STARS_PREFIX.len());
+            if prefix == STARS_PREFIX {
+                let rating = class_str.parse().unwrap();
                 assert!(rating >= 1 && rating <= 10);
                 result = Some(rating);
             }
@@ -62,7 +62,7 @@ fn generate_item_from_node(elem: &ElementDataRef) -> Item {
     }
 }
 
-pub fn get_all_items(html: Html) -> Vec<Item> {
-    html.parse().select("#browserItemList>li").unwrap()
+pub fn get_all_items(html: NodeRef) -> Vec<Item> {
+    html.select("#browserItemList>li").unwrap()
         .map(|elem| generate_item_from_node(&elem)).collect()
 }
