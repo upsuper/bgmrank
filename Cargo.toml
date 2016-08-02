@@ -6,7 +6,7 @@ authors = ["Xidorn Quan <quanxunzhen@gmail.com>"]
 [dependencies]
 getopts = "0.2"
 enum-set = "0.0.6"
-selectors = "0.2"
+selectors = "0.5"
 string_cache = "0.2"
 
 [dependencies.kuchiki]
