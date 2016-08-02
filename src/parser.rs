@@ -39,8 +39,9 @@ fn get_item_tags(elem: &ElementDataRef) -> Vec<String> {
     static TAGS_PREFIX: &'static str = "标签: ";
     if let Some(tags_elem) = elem.query_selector(".collectInfo>.tip") {
         let all_text = tags_elem.text_contents();
-        assert!(all_text.starts_with(TAGS_PREFIX));
-        all_text[TAGS_PREFIX.len()..].split(" ")
+        let tag_text = all_text.trim();
+        assert!(tag_text.starts_with(TAGS_PREFIX));
+        tag_text[TAGS_PREFIX.len()..].split(" ")
             .filter_map(|s| {
                 if !s.is_empty() {
                     Some(s.to_string())
