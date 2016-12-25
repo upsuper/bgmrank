@@ -6,9 +6,9 @@ authors = ["Xidorn Quan <quanxunzhen@gmail.com>"]
 [dependencies]
 getopts = "0.2"
 enum-set = "0.0.6"
-selectors = "0.12"
-string_cache = "0.2"
+selectors = "0.14"
+html5ever-atoms = "0.1.2"
 
 [dependencies.kuchiki]
-version = "0.3"
+version = "0.4"
 features = ["hyper"]
