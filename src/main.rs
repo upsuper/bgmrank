@@ -13,10 +13,8 @@ mod helpers;
 mod parser;
 mod stats;
 
-use std::cmp::PartialOrd;
-
 use data::{Item, MAX_RATING};
-use stats::{Stats, Histogram};
+use stats::Histogram;
 
 fn get_all_items(args: &init::Args) -> Vec<Item> {
     let mut result = vec![];
@@ -32,32 +30,6 @@ fn get_all_items(args: &init::Args) -> Vec<Item> {
     result
 }
 
-struct TagStats {
-    tag: String,
-    stats: Stats
-}
-
-fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
-    let mut result: Vec<TagStats> = classifier::classify_by_tags(all_items)
-        .into_iter().filter_map(|(tag, items)| {
-            let hist: Histogram = items.into_iter().collect();
-            let stats = hist.get_stats();
-            if stats.rating.is_nan() {
-                return None;
-            }
-            Some(TagStats {
-                tag: tag,
-                stats: stats
-            })
-        }).collect();
-    result.sort_by(|l, r| {
-        // It should be safe to unwrap here because we should have
-        // filtered out all NaNs in the loop above.
-        l.stats.rating.partial_cmp(&r.stats.rating).unwrap().reverse()
-    });
-    result
-}
-
 fn generate_bar(width: usize) -> String {
     std::iter::repeat('#').take(width).collect()
 }
@@ -69,7 +41,7 @@ fn main() {
     let all_items = get_all_items(&args);
     let hist: Histogram = all_items.iter().collect();
 
-    for tag_stats in generate_tag_stats(&all_items) {
+    for tag_stats in stats::generate_tag_stats(&all_items) {
         println!("{} {}: {}/{}", tag_stats.stats.rating,
                  tag_stats.tag, tag_stats.stats.rated, tag_stats.stats.total);
     }

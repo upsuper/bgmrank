@@ -4,6 +4,7 @@ use std::fmt::{Display, Formatter};
 use std::iter::FromIterator;
 use std::ops::{Index, IndexMut};
 
+use classifier;
 use data::{Rating, Item, MAX_RATING};
 
 #[derive(PartialEq)]
@@ -99,4 +100,30 @@ impl IndexMut<Option<Rating>> for Histogram {
             None => &mut self.ratings[0]
         }
     }
+}
+
+pub struct TagStats {
+    pub tag: String,
+    pub stats: Stats
+}
+
+pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
+    let mut result: Vec<TagStats> = classifier::classify_by_tags(all_items)
+        .into_iter().filter_map(|(tag, items)| {
+            let hist: Histogram = items.into_iter().collect();
+            let stats = hist.get_stats();
+            if stats.rating.is_nan() {
+                return None;
+            }
+            Some(TagStats {
+                tag: tag,
+                stats: stats
+            })
+        }).collect();
+    result.sort_by(|l, r| {
+        // It should be safe to unwrap here because we should have
+        // filtered out all NaNs in the loop above.
+        l.stats.rating.partial_cmp(&r.stats.rating).unwrap().reverse()
+    });
+    result
 }
