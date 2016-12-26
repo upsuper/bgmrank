@@ -10,7 +10,7 @@ use data::{Rating, Item, MAX_RATING};
 #[derive(PartialEq)]
 pub struct Interval {
     pub avg: f32,
-    pub stdev: f32
+    pub stdev: f32,
 }
 
 impl Interval {
@@ -35,16 +35,19 @@ impl Display for Interval {
 pub struct Stats {
     pub total: usize,
     pub rated: usize,
-    pub rating: Interval
+    pub rating: Interval,
 }
 
 pub struct Histogram {
-    ratings: [usize; MAX_RATING as usize + 1]
+    ratings: [usize; MAX_RATING as usize + 1],
 }
 
 impl Histogram {
     pub fn get_max_rated(&self) -> (Rating, usize) {
-        self.ratings.iter().enumerate().skip(1)
+        self.ratings
+            .iter()
+            .enumerate()
+            .skip(1)
             .fold((0, 0), |(cur_rating, cur_max), (rating, &num)| {
                 if num > cur_max {
                     (rating as Rating, num)
@@ -54,26 +57,35 @@ impl Histogram {
             })
     }
     pub fn get_stats(&self) -> Stats {
-        let (rated, sum) = self.ratings.iter().enumerate().skip(1)
-            .fold((0, 0), |(count, sum), (rating, &num)| {
-                (count + num, sum + (rating as usize * num))
-            });
+        let (rated, sum) = self.ratings
+            .iter()
+            .enumerate()
+            .skip(1)
+            .fold((0, 0),
+                  |(count, sum), (rating, &num)| (count + num, sum + (rating as usize * num)));
         let avg = sum as f32 / rated as f32;
-        let var = self.ratings.iter().enumerate().skip(1)
-            .fold(0f32, |sum, (rating, &num)| {
-                sum + num as f32 * (rating as f32 - avg).powf(2.0)
-            }) / rated as f32;
+        let var = self.ratings
+            .iter()
+            .enumerate()
+            .skip(1)
+            .fold(0f32,
+                  |sum, (rating, &num)| sum + num as f32 * (rating as f32 - avg).powf(2.0)) /
+                  rated as f32;
         Stats {
             total: rated + self.ratings[0],
             rated: rated,
-            rating: Interval { avg: avg, stdev: var.sqrt() }
+            rating: Interval {
+                avg: avg,
+                stdev: var.sqrt(),
+            },
         }
     }
 }
 
 impl<'a> FromIterator<&'a Item> for Histogram {
     fn from_iter<Iter>(iter: Iter) -> Self
-            where Iter: IntoIterator<Item=&'a Item> {
+        where Iter: IntoIterator<Item = &'a Item>
+    {
         let mut result = Histogram { ratings: [0; MAX_RATING as usize + 1] };
         for item in iter {
             result[item.rating] += 1;
@@ -87,29 +99,29 @@ impl Index<Option<Rating>> for Histogram {
     fn index<'a>(&'a self, rating: Option<Rating>) -> &'a Self::Output {
         match rating {
             Some(rating) => &self.ratings[rating as usize],
-            None => &self.ratings[0]
+            None => &self.ratings[0],
         }
     }
 }
 
 impl IndexMut<Option<Rating>> for Histogram {
-    fn index_mut<'a>(&'a mut self, rating: Option<Rating>)
-            -> &'a mut Self::Output {
+    fn index_mut<'a>(&'a mut self, rating: Option<Rating>) -> &'a mut Self::Output {
         match rating {
             Some(val) => &mut self.ratings[val as usize],
-            None => &mut self.ratings[0]
+            None => &mut self.ratings[0],
         }
     }
 }
 
 pub struct TagStats {
     pub tag: String,
-    pub stats: Stats
+    pub stats: Stats,
 }
 
 pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
     let mut result: Vec<TagStats> = classifier::classify_by_tags(all_items)
-        .into_iter().filter_map(|(tag, items)| {
+        .into_iter()
+        .filter_map(|(tag, items)| {
             let hist: Histogram = items.into_iter().collect();
             let stats = hist.get_stats();
             if stats.rating.is_nan() {
@@ -117,9 +129,10 @@ pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
             }
             Some(TagStats {
                 tag: tag,
-                stats: stats
+                stats: stats,
             })
-        }).collect();
+        })
+        .collect();
     result.sort_by(|l, r| {
         // It should be safe to unwrap here because we should have
         // filtered out all NaNs in the loop above.

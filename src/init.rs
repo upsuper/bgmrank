@@ -11,16 +11,17 @@ fn get_args() -> (String, Vec<String>) {
     (args.next().unwrap(), args.collect())
 }
 
-fn list_enum_str<E: 'static+ListAll+ToStaticStr>() -> Vec<&'static str> {
+fn list_enum_str<E: 'static + ListAll + ToStaticStr>() -> Vec<&'static str> {
     E::list_all().iter().map(|e| e.to_static_str()).collect()
 }
 
 fn get_opts() -> Options {
     let mut opts = Options::new();
-    opts.optmulti("c", "category",
-                  &list_enum_str::<Category>().join(", "), "CAT");
-    opts.optmulti("s", "state",
-                  &list_enum_str::<State>().join(", "), "STATE");
+    opts.optmulti("c",
+                  "category",
+                  &list_enum_str::<Category>().join(", "),
+                  "CAT");
+    opts.optmulti("s", "state", &list_enum_str::<State>().join(", "), "STATE");
     opts.optflag("h", "help", "print this help menu");
     opts
 }
@@ -34,19 +35,19 @@ fn show_usage_and_exit(program: String, opts: Options, code: i32) -> ! {
 pub struct Args {
     pub username: String,
     pub categories: EnumSet<Category>,
-    pub states: EnumSet<State>
+    pub states: EnumSet<State>,
 }
 
-fn process_opt_list<E: ToStaticStr+FromStr+CLike>(name: &'static str,
-                                                  item_list: Vec<String>,
-                                                  default_value: E)
-        -> Result<EnumSet<E>, String> {
+fn process_opt_list<E: ToStaticStr + FromStr + CLike>(name: &'static str,
+                                                      item_list: Vec<String>,
+                                                      default_value: E)
+                                                      -> Result<EnumSet<E>, String> {
     let mut result = EnumSet::new();
     for item in item_list {
         match item.parse::<E>() {
             Ok(value) => {
                 result.insert(value);
-            },
+            }
             Err(_) => {
                 return Err(format!("unknown {} '{}'", name, item));
             }
@@ -64,10 +65,10 @@ fn parse_opts(mut matches: Matches) -> Result<Args, String> {
     }
     Ok(Args {
         username: matches.free.remove(0),
-        categories: try!(process_opt_list::<Category>(
-            "category", matches.opt_strs("c"), Category::Anime)),
-        states: try!(process_opt_list::<State>(
-            "state", matches.opt_strs("s"), State::Collect))
+        categories: try!(process_opt_list::<Category>("category",
+                                                      matches.opt_strs("c"),
+                                                      Category::Anime)),
+        states: try!(process_opt_list::<State>("state", matches.opt_strs("s"), State::Collect)),
     })
 }
 
@@ -75,7 +76,7 @@ pub fn handle_opts() -> Args {
     let (program, args) = get_args();
     let opts = get_opts();
     let matches = match opts.parse(&args) {
-        Ok(m) => { m },
+        Ok(m) => m,
         Err(f) => {
             println!("{}", f.to_string());
             show_usage_and_exit(program, opts, 2);
@@ -85,7 +86,7 @@ pub fn handle_opts() -> Args {
         show_usage_and_exit(program, opts, 0);
     }
     match parse_opts(matches) {
-        Ok(result) => { result },
+        Ok(result) => result,
         Err(msg) => {
             println!("Error: {}", msg);
             show_usage_and_exit(program, opts, 2);

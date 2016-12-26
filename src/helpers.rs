@@ -5,8 +5,7 @@ pub type ElementDataRef = NodeDataRef<ElementData>;
 
 pub trait QuerySelector {
     type Iter: Iterator;
-    fn query_selector(&self, selectors: &str)
-            -> Option<<Self::Iter as Iterator>::Item> {
+    fn query_selector(&self, selectors: &str) -> Option<<Self::Iter as Iterator>::Item> {
         self.query_selector_all(selectors).next()
     }
     fn query_selector_all(&self, selectors: &str) -> Self::Iter;

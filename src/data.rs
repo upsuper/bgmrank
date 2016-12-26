@@ -8,7 +8,7 @@ pub trait ToStaticStr {
     fn to_static_str(&self) -> &'static str;
 }
 
-pub trait ListAll : Sized {
+pub trait ListAll: Sized {
     fn list_all() -> &'static [Self];
 }
 
@@ -88,5 +88,5 @@ pub struct Item {
     pub id: Id,
     pub title: String,
     pub rating: Option<Rating>,
-    pub tags: Vec<String>
+    pub tags: Vec<String>,
 }

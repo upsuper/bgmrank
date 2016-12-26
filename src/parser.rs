@@ -14,8 +14,7 @@ fn get_item_id(elem: &ElementDataRef) -> Id {
 
 fn get_item_title(elem: &ElementDataRef) -> String {
     let title_node = elem.query_selector("h3>*:last-child").unwrap();
-    assert!(title_node.name == qualname!(html, "small") ||
-            title_node.name == qualname!(html, "a"));
+    assert!(title_node.name == qualname!(html, "small") || title_node.name == qualname!(html, "a"));
     title_node.text_contents()
 }
 
@@ -41,14 +40,16 @@ fn get_item_tags(elem: &ElementDataRef) -> Vec<String> {
         let all_text = tags_elem.text_contents();
         let tag_text = all_text.trim();
         assert!(tag_text.starts_with(TAGS_PREFIX));
-        tag_text[TAGS_PREFIX.len()..].split(" ")
+        tag_text[TAGS_PREFIX.len()..]
+            .split(" ")
             .filter_map(|s| {
                 if !s.is_empty() {
                     Some(s.to_string())
                 } else {
                     None
                 }
-            }).collect()
+            })
+            .collect()
     } else {
         vec![]
     }
@@ -59,11 +60,13 @@ fn generate_item_from_node(elem: &ElementDataRef) -> Item {
         id: get_item_id(elem),
         title: get_item_title(elem),
         rating: get_item_rating(elem),
-        tags: get_item_tags(elem)
+        tags: get_item_tags(elem),
     }
 }
 
 pub fn get_all_items(html: NodeRef) -> Vec<Item> {
-    html.select("#browserItemList>li").unwrap()
-        .map(|elem| generate_item_from_node(&elem)).collect()
+    html.select("#browserItemList>li")
+        .unwrap()
+        .map(|elem| generate_item_from_node(&elem))
+        .collect()
 }

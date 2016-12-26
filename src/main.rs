@@ -42,8 +42,11 @@ fn main() {
     let hist: Histogram = all_items.iter().collect();
 
     for tag_stats in stats::generate_tag_stats(&all_items) {
-        println!("{} {}: {}/{}", tag_stats.stats.rating,
-                 tag_stats.tag, tag_stats.stats.rated, tag_stats.stats.total);
+        println!("{} {}: {}/{}",
+                 tag_stats.stats.rating,
+                 tag_stats.tag,
+                 tag_stats.stats.rated,
+                 tag_stats.stats.total);
     }
     println!("");
 
@@ -51,8 +54,7 @@ fn main() {
     let stats = hist.get_stats();
     for rating in 1..(MAX_RATING + 1) {
         let rated = hist[Some(rating)];
-        let num = (rated as f32 / max_rated as f32 *
-                   MAX_COL_WIDTH as f32).round() as usize;
+        let num = (rated as f32 / max_rated as f32 * MAX_COL_WIDTH as f32).round() as usize;
         let bar = generate_bar(num) + if num > 0 { " " } else { "" };
         println!("{:>2}: {}{}", rating, bar, rated);
     }

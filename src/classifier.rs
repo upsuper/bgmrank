@@ -5,8 +5,7 @@ fn normalize_tag(tag: &str) -> String {
     tag.to_lowercase()
 }
 
-pub fn classify_by_tags<'a>(items: &'a [Item])
-        -> HashMap<String, Vec<&'a Item>> {
+pub fn classify_by_tags<'a>(items: &'a [Item]) -> HashMap<String, Vec<&'a Item>> {
     let mut tags_map = HashMap::new();
     let mut items_map = HashMap::new();
     for item in items {
@@ -27,7 +26,8 @@ pub fn classify_by_tags<'a>(items: &'a [Item])
                 } else {
                     (cur_tag, cur_num)
                 }
-            }).0;
+            })
+            .0;
         result.insert(display_tag, items_map.remove(&tag).unwrap());
     }
     result
