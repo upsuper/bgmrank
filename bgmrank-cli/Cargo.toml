@@ -7,6 +7,10 @@ repository = "https://github.com/upsuper/bgmrank"
 license = "MIT"
 keywords = ["bangumi"]
 
+[[bin]]
+name = "bgmrank"
+path = "main.rs"
+
 [dependencies]
 enum-set = "0.0.6"
 getopts = "0.2"
