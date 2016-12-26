@@ -9,9 +9,7 @@ matrix:
   allow_failures:
     - rust: nightly
 
-cache:
-  directories:
-    - $HOME/.cargo
+cache: cargo
 
 branches:
   except:
