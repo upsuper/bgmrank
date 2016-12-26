@@ -1,10 +1,9 @@
 [package]
-name = "bgmrank"
-version = "0.1.0"
-authors = ["Xidorn Quan <quanxunzhen@gmail.com>"]
+name = "libbgmrank"
+version = "0.0.1"
+authors = ["Xidorn Quan <me@upsuper.org>"]
 
 [dependencies]
-getopts = "0.2"
 enum-set = "0.0.6"
 selectors = "0.14"
 html5ever-atoms = "0.1.2"

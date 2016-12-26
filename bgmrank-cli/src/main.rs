@@ -1,27 +1,17 @@
 extern crate enum_set;
 extern crate getopts;
-#[macro_use]
-extern crate html5ever_atoms;
-extern crate kuchiki;
-extern crate selectors;
+extern crate libbgmrank;
 
-mod classifier;
-mod data;
-mod fetch;
 mod init;
-mod helpers;
-mod parser;
-mod stats;
 
-use data::{Item, MAX_RATING};
-use stats::Histogram;
+use libbgmrank::{Item, Histogram, MAX_RATING};
 
 fn get_all_items(args: &init::Args) -> Vec<Item> {
     let mut result = vec![];
     for category in args.categories.iter() {
         for state in args.states.iter() {
             println!("fetching {}: {}/{}", args.username, category, state);
-            result.extend(fetch::get_items(&args.username, category, state, |page| {
+            result.extend(libbgmrank::get_items(&args.username, category, state, |page| {
                 println!("  fetching page {}...", page);
             }));
         }
@@ -41,7 +31,7 @@ fn main() {
     let all_items = get_all_items(&args);
     let hist: Histogram = all_items.iter().collect();
 
-    for tag_stats in stats::generate_tag_stats(&all_items) {
+    for tag_stats in libbgmrank::generate_tag_stats(&all_items) {
         println!("{} {}: {}/{}",
                  tag_stats.stats.rating,
                  tag_stats.tag,

@@ -4,7 +4,7 @@ use std::str::FromStr;
 use getopts::{Options, Matches};
 use enum_set::{EnumSet, CLike};
 
-use data::{ListAll, ToStaticStr, Category, State};
+use libbgmrank::{ListAll, ToStaticStr, Category, State};
 
 fn get_args() -> (String, Vec<String>) {
     let mut args = std::env::args();
