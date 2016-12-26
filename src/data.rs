@@ -1,4 +1,5 @@
 use std;
+use std::fmt;
 use std::str::FromStr;
 
 use enum_set::CLike;
@@ -27,6 +28,11 @@ macro_rules! static_str_enum {
                 match *self {
                     $($name::$item => stringify!($str)),*
                 }
+            }
+        }
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                f.write_str(self.to_static_str())
             }
         }
         impl ListAll for $name {
