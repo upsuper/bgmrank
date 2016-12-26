@@ -1,0 +1,22 @@
+language: rust
+
+rust:
+  - stable
+  - beta
+  - nightly
+
+matrix:
+  allow_failures:
+    - rust: nightly
+
+cache:
+  directories:
+    - $HOME/.cargo
+
+branches:
+  except:
+    - legacy
+
+script:
+  - cd bgmrank-cli
+  - cargo build --verbose
