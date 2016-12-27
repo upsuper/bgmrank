@@ -3,6 +3,7 @@ name = "libbgmrank"
 version = "0.0.1"
 dependencies = [
  "enum-set 0.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "float-cmp 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "html5ever-atoms 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "kuchiki 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "selectors 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -111,6 +112,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "enum-set"
 version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "float-cmp"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "fnv"
@@ -283,6 +292,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "num-traits"
+version = "0.1.36"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "num_cpus"
@@ -603,6 +617,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum encoding-index-tradchinese 1.20141219.5 (registry+https://github.com/rust-lang/crates.io-index)" = "fd0e20d5688ce3cab59eb3ef3a2083a5c77bf496cb798dc6fcdb75f323890c18"
 "checksum encoding_index_tests 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "a246d82be1c9d791c5dfde9a2bd045fc3cbba3fa2b11ad558f27d01712f00569"
 "checksum enum-set 0.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "e997f85125104c94b966e0a2a1d533b555d22dbcb4eff8a77ecaea70de8a2acf"
+"checksum float-cmp 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "ae5c9d3ac80527346eb21666d9135b695243a48ef5f2df19022856975a66c411"
 "checksum fnv 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)" = "6cc484842f1e2884faf56f529f960cc12ad8c71ce96cc7abba0a067c98fee344"
 "checksum futf 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e7a9689380a2553b51c564b3d9178075c68ebd0b397972c783acfd28b46c28ad"
 "checksum gcc 0.3.40 (registry+https://github.com/rust-lang/crates.io-index)" = "872db9e59486ef2b14f8e8c10e9ef02de2bccef6363d7f34835dedb386b3d950"
@@ -624,6 +639,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum mac 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1b1db08c0d0ddbb591e65f1da58d1cefccc94a2faa0c55bf979ce215a3e04d5e"
 "checksum matches 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "efd7622e3022e1a6eaa602c4cea8912254e5582c9c692e9167714182244801b1"
 "checksum mime 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "b5c93a4bd787ddc6e7833c519b73a50883deb5863d76d9b71eb8216fb7f94e66"
+"checksum num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)" = "a16a42856a256b39c6d3484f097f6713e14feacd9bfb02290917904fae46c81c"
 "checksum num_cpus 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "55aabf4e2d6271a2e4e4c0f2ea1f5b07cc589cc1a9e9213013b54a76678ca4f3"
 "checksum openssl 0.7.14 (registry+https://github.com/rust-lang/crates.io-index)" = "c4117b6244aac42ed0150a6019b4d953d28247c5dd6ae6f46ae469b5f2318733"
 "checksum openssl-sys 0.7.17 (registry+https://github.com/rust-lang/crates.io-index)" = "89c47ee94c352eea9ddaf8e364be7f978a3bb6d66d73176572484238dd5a5c3f"

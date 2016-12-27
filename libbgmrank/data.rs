@@ -84,6 +84,7 @@ pub type Id = u32;
 pub type Rating = u8;
 pub const MAX_RATING: Rating = 10;
 
+#[derive(Default)]
 pub struct Item {
     pub id: Id,
     pub title: String,

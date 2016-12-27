@@ -18,3 +18,4 @@ branches:
 script:
   - cd bgmrank-cli
   - cargo build --verbose
+  - cargo test --verbose

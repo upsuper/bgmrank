@@ -140,3 +140,88 @@ pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
     });
     result
 }
+
+#[cfg(test)]
+mod test {
+    use data::Item;
+    use float_cmp::ApproxEqUlps;
+    use super::Histogram;
+
+    macro_rules! item_with_rating {
+        ($rating: expr) => {
+            Item { rating: $rating, ..Default::default() }
+        }
+    }
+
+    #[test]
+    fn test_generate_histogram() {
+        let items = vec![
+            item_with_rating!(Some(4)),
+            item_with_rating!(None),
+            item_with_rating!(Some(2)),
+            item_with_rating!(Some(5)),
+            item_with_rating!(Some(1)),
+            item_with_rating!(Some(10)),
+            item_with_rating!(Some(4)),
+            item_with_rating!(None),
+            item_with_rating!(Some(2)),
+            item_with_rating!(Some(2)),
+            item_with_rating!(Some(9)),
+            item_with_rating!(Some(2)),
+            item_with_rating!(Some(3)),
+            item_with_rating!(Some(6)),
+            item_with_rating!(None),
+            item_with_rating!(Some(9)),
+            item_with_rating!(Some(1)),
+            item_with_rating!(Some(5)),
+            item_with_rating!(Some(6)),
+            item_with_rating!(None),
+        ];
+        let hist = items.iter().collect::<Histogram>();
+        assert_eq!(hist.ratings, [4, 2, 4, 1, 2, 2, 2, 0, 0, 2, 1]);
+    }
+
+    fn get_test_histogram() -> Histogram {
+        Histogram { ratings: [200, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110] }
+    }
+
+    #[test]
+    fn test_histogram_indexing() {
+        let hist = get_test_histogram();
+        assert_eq!(hist[None], 200);
+        for i in 1..10 {
+            assert_eq!(hist[Some(i)], 100 + i as usize);
+        }
+        let mut hist = get_test_histogram();
+        hist[None] *= 2;
+        assert_eq!(hist[None], 400);
+        for i in 1..10 {
+            let m = i as usize + 1;
+            hist[Some(i)] *= m;
+            assert_eq!(hist[Some(i)], (100 + i as usize) * m);
+        }
+    }
+
+    #[test]
+    fn test_histogram_max_rated() {
+        let hist = Histogram { ratings: [10, 1, 2, 5, 5, 4, 8, 8, 7, 0, 5] };
+        assert_eq!(hist.get_max_rated(), (6, 8));
+    }
+
+    #[test]
+    fn test_histogram_stats() {
+        let hist = Histogram {
+            ratings: [60, 82, 60, 76, 26, 4, 69, 40, 85, 67, 96]
+        };
+        let stats = hist.get_stats();
+        assert_eq!(stats.total, 665);
+        assert_eq!(stats.rated, 605);
+        assert!(stats.rating.avg.approx_eq_ulps(&5.77024793388, 1));
+        assert!(stats.rating.stdev.approx_eq_ulps(&3.22415072111, 1));
+
+        let hist = Histogram { ratings: [10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] };
+        let stats = hist.get_stats();
+        assert_eq!(stats.rated, 0);
+        assert!(stats.rating.is_nan());
+    }
+}

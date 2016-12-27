@@ -19,3 +19,6 @@ html5ever-atoms = "0.1.2"
 [dependencies.kuchiki]
 version = "0.4"
 features = ["hyper"]
+
+[dev-dependencies]
+float-cmp = "0.2.3"
