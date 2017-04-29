@@ -1,5 +1,7 @@
 language: rust
 
+dist: trusty
+
 rust:
   - stable
   - beta
