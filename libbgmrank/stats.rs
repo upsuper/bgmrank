@@ -1,11 +1,11 @@
-use std::cmp::{PartialOrd, Ordering};
+use std::cmp::{Ordering, PartialOrd};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::iter::FromIterator;
 use std::ops::{Index, IndexMut};
 
 use classifier;
-use data::{Rating, Item, MAX_RATING};
+use data::{Item, Rating, MAX_RATING};
 
 #[derive(PartialEq)]
 pub struct Interval {
@@ -44,33 +44,33 @@ pub struct Histogram {
 
 impl Histogram {
     pub fn get_max_rated(&self) -> (Rating, usize) {
-        self.ratings
-            .iter()
-            .enumerate()
-            .skip(1)
-            .fold((0, 0), |(cur_rating, cur_max), (rating, &num)| {
+        self.ratings.iter().enumerate().skip(1).fold(
+            (0, 0),
+            |(cur_rating, cur_max), (rating, &num)| {
                 if num > cur_max {
                     (rating as Rating, num)
                 } else {
                     (cur_rating, cur_max)
                 }
-            })
+            },
+        )
     }
     pub fn get_stats(&self) -> Stats {
         let (rated, sum) = self.ratings
             .iter()
             .enumerate()
             .skip(1)
-            .fold((0, 0),
-                  |(count, sum), (rating, &num)| (count + num, sum + (rating as usize * num)));
+            .fold((0, 0), |(count, sum), (rating, &num)| {
+                (count + num, sum + (rating as usize * num))
+            });
         let avg = sum as f32 / rated as f32;
         let var = self.ratings
             .iter()
             .enumerate()
             .skip(1)
-            .fold(0f32,
-                  |sum, (rating, &num)| sum + num as f32 * (rating as f32 - avg).powf(2.0)) /
-                  rated as f32;
+            .fold(0f32, |sum, (rating, &num)| {
+                sum + num as f32 * (rating as f32 - avg).powf(2.0)
+            }) / rated as f32;
         Stats {
             total: rated + self.ratings[0],
             rated: rated,
@@ -84,9 +84,12 @@ impl Histogram {
 
 impl<'a> FromIterator<&'a Item> for Histogram {
     fn from_iter<Iter>(iter: Iter) -> Self
-        where Iter: IntoIterator<Item = &'a Item>
+    where
+        Iter: IntoIterator<Item = &'a Item>,
     {
-        let mut result = Histogram { ratings: [0; MAX_RATING as usize + 1] };
+        let mut result = Histogram {
+            ratings: [0; MAX_RATING as usize + 1],
+        };
         for item in iter {
             result[item.rating] += 1;
         }
@@ -136,21 +139,28 @@ pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
     result.sort_by(|l, r| {
         // It should be safe to unwrap here because we should have
         // filtered out all NaNs in the loop above.
-        l.stats.rating.partial_cmp(&r.stats.rating).unwrap().reverse()
+        l.stats
+            .rating
+            .partial_cmp(&r.stats.rating)
+            .unwrap()
+            .reverse()
     });
     result
 }
 
 #[cfg(test)]
 mod test {
+    use super::Histogram;
     use data::Item;
     use float_cmp::ApproxEqUlps;
-    use super::Histogram;
 
     macro_rules! item_with_rating {
-        ($rating: expr) => {
-            Item { rating: $rating, ..Default::default() }
-        }
+        ($rating:expr) => {
+            Item {
+                rating: $rating,
+                ..Default::default()
+            }
+        };
     }
 
     #[test]
@@ -182,7 +192,9 @@ mod test {
     }
 
     fn get_test_histogram() -> Histogram {
-        Histogram { ratings: [200, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110] }
+        Histogram {
+            ratings: [200, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+        }
     }
 
     #[test]
@@ -204,14 +216,16 @@ mod test {
 
     #[test]
     fn test_histogram_max_rated() {
-        let hist = Histogram { ratings: [10, 1, 2, 5, 5, 4, 8, 8, 7, 0, 5] };
+        let hist = Histogram {
+            ratings: [10, 1, 2, 5, 5, 4, 8, 8, 7, 0, 5],
+        };
         assert_eq!(hist.get_max_rated(), (6, 8));
     }
 
     #[test]
     fn test_histogram_stats() {
         let hist = Histogram {
-            ratings: [60, 82, 60, 76, 26, 4, 69, 40, 85, 67, 96]
+            ratings: [60, 82, 60, 76, 26, 4, 69, 40, 85, 67, 96],
         };
         let stats = hist.get_stats();
         assert_eq!(stats.total, 665);
@@ -219,7 +233,9 @@ mod test {
         assert!(stats.rating.avg.approx_eq_ulps(&5.77024793388, 1));
         assert!(stats.rating.stdev.approx_eq_ulps(&3.22415072111, 1));
 
-        let hist = Histogram { ratings: [10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] };
+        let hist = Histogram {
+            ratings: [10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        };
         let stats = hist.get_stats();
         assert_eq!(stats.rated, 0);
         assert!(stats.rating.is_nan());

@@ -1,5 +1,5 @@
-use kuchiki::{NodeDataRef, ElementData};
-use kuchiki::iter::{Select, Elements, Descendants};
+use kuchiki::iter::{Descendants, Elements, Select};
+use kuchiki::{ElementData, NodeDataRef};
 
 pub type ElementDataRef = NodeDataRef<ElementData>;
 

@@ -1,7 +1,7 @@
-use selectors::Element;
 use kuchiki::NodeRef;
+use selectors::Element;
 
-use data::{Id, Rating, Item};
+use data::{Id, Item, Rating};
 use helpers::{ElementDataRef, QuerySelector};
 
 fn get_item_id(elem: &ElementDataRef) -> Id {

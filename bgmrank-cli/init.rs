@@ -1,10 +1,10 @@
 use std;
 use std::str::FromStr;
 
-use getopts::{Options, Matches};
-use enum_set::{EnumSet, CLike};
+use enum_set::{CLike, EnumSet};
+use getopts::{Matches, Options};
 
-use libbgmrank::{ListAll, ToStaticStr, Category, State};
+use libbgmrank::{Category, ListAll, State, ToStaticStr};
 
 fn get_args() -> (String, Vec<String>) {
     let mut args = std::env::args();
@@ -17,10 +17,12 @@ fn list_enum_str<E: 'static + ListAll + ToStaticStr>() -> Vec<&'static str> {
 
 fn get_opts() -> Options {
     let mut opts = Options::new();
-    opts.optmulti("c",
-                  "category",
-                  &list_enum_str::<Category>().join(", "),
-                  "CAT");
+    opts.optmulti(
+        "c",
+        "category",
+        &list_enum_str::<Category>().join(", "),
+        "CAT",
+    );
     opts.optmulti("s", "state", &list_enum_str::<State>().join(", "), "STATE");
     opts.optflag("h", "help", "print this help menu");
     opts
@@ -38,10 +40,11 @@ pub struct Args {
     pub states: EnumSet<State>,
 }
 
-fn process_opt_list<E: ToStaticStr + FromStr + CLike>(name: &'static str,
-                                                      item_list: Vec<String>,
-                                                      default_value: E)
-                                                      -> Result<EnumSet<E>, String> {
+fn process_opt_list<E: ToStaticStr + FromStr + CLike>(
+    name: &'static str,
+    item_list: Vec<String>,
+    default_value: E,
+) -> Result<EnumSet<E>, String> {
     let mut result = EnumSet::new();
     for item in item_list {
         match item.parse::<E>() {
@@ -65,10 +68,16 @@ fn parse_opts(mut matches: Matches) -> Result<Args, String> {
     }
     Ok(Args {
         username: matches.free.remove(0),
-        categories: try!(process_opt_list::<Category>("category",
-                                                      matches.opt_strs("c"),
-                                                      Category::Anime)),
-        states: try!(process_opt_list::<State>("state", matches.opt_strs("s"), State::Collect)),
+        categories: try!(process_opt_list::<Category>(
+            "category",
+            matches.opt_strs("c"),
+            Category::Anime
+        )),
+        states: try!(process_opt_list::<State>(
+            "state",
+            matches.opt_strs("s"),
+            State::Collect
+        )),
     })
 }
 
