@@ -8,7 +8,7 @@ use data::{ToStaticStr, Category, State, Item};
 
 const ITEMS_PER_PAGE: usize = 24;
 
-fn fetch_page<U: IntoUrl>(client: &Client, url: U) -> Result<NodeRef, hyper::Error> {
+fn fetch_page(client: &Client, url: impl IntoUrl) -> Result<NodeRef, hyper::Error> {
     use html5ever::encoding::all::UTF_8;
     use html5ever::encoding::EncodingRef;
     use html5ever::driver::BytesOpts;
@@ -21,9 +21,12 @@ fn fetch_page<U: IntoUrl>(client: &Client, url: U) -> Result<NodeRef, hyper::Err
     Ok(kuchiki::parse_html().from_bytes(opts).read_from(&mut resp)?)
 }
 
-pub fn get_items<C>(username: &str, category: Category, state: State, callback: C) -> Vec<Item>
-    where C: Fn(usize)
-{
+pub fn get_items(
+    username: &str,
+    category: Category,
+    state: State,
+    callback: impl Fn(usize)
+) -> Vec<Item> {
     use hyper::net::HttpsConnector;
     use hyper_rustls::TlsClient;
 

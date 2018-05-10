@@ -25,7 +25,7 @@ macro_rules! static_str_enum {
         }
         impl ToStaticStr for $name {
             fn to_static_str(&self) -> &'static str {
-                match *self {
+                match self {
                     $($name::$item => stringify!($str)),*
                 }
             }
