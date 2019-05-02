@@ -12,6 +12,6 @@ name = "bgmrank"
 path = "main.rs"
 
 [dependencies]
-enum-set = "0.0.6"
+enum-set = "0.0.8"
 getopts = "0.2"
 libbgmrank = { path = "../libbgmrank", version = "0.0.1" }
