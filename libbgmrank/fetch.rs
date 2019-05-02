@@ -1,5 +1,6 @@
 use crate::data::{Category, Item, State, ToStaticStr};
 use crate::parser;
+use html5ever::tendril::stream::TendrilSink;
 use kuchiki::NodeRef;
 use reqwest::Client;
 use std::error::Error;
@@ -7,19 +8,9 @@ use std::error::Error;
 const ITEMS_PER_PAGE: usize = 24;
 
 fn fetch_page(client: &Client, url: &str) -> Result<NodeRef, Box<dyn Error>> {
-    use html5ever::driver::BytesOpts;
-    use html5ever::encoding::all::UTF_8;
-    use html5ever::encoding::EncodingRef;
-    use html5ever::tendril::TendrilSink;
-
     client.get(url).send()?;
     let mut resp = client.get(url).send()?;
-    let opts = BytesOpts {
-        transport_layer_encoding: Some(UTF_8 as EncodingRef),
-    };
-    Ok(kuchiki::parse_html()
-        .from_bytes(opts)
-        .read_from(&mut resp)?)
+    Ok(kuchiki::parse_html().from_utf8().read_from(&mut resp)?)
 }
 
 pub fn get_items(

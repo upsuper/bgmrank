@@ -1,12 +1,12 @@
 use crate::data::{Id, Item, Rating};
 use crate::helpers::{ElementDataRef, QuerySelector};
-use html5ever_atoms::{local_name, namespace_url, ns, qualname};
+use html5ever::{expanded_name, local_name, namespace_url, ns};
 use kuchiki::NodeRef;
-use selectors::Element;
 
 fn get_item_id(elem: &ElementDataRef) -> Id {
     static ID_PREFIX: &'static str = "item_";
-    let id = elem.get_id().unwrap();
+    let attrs = elem.attributes.borrow();
+    let id = attrs.get(local_name!("id")).unwrap();
     let (prefix, id_str) = id.split_at(ID_PREFIX.len());
     assert!(prefix == ID_PREFIX);
     id_str.parse().unwrap()
@@ -14,7 +14,10 @@ fn get_item_id(elem: &ElementDataRef) -> Id {
 
 fn get_item_title(elem: &ElementDataRef) -> String {
     let title_node = elem.query_selector("h3>*:last-child").unwrap();
-    assert!(title_node.name == qualname!(html, "small") || title_node.name == qualname!(html, "a"));
+    assert!(
+        title_node.name.expanded() == expanded_name!(html "small")
+            || title_node.name.expanded() == expanded_name!(html "a")
+    );
     title_node.text_contents()
 }
 
@@ -22,14 +25,17 @@ fn get_item_rating(elem: &ElementDataRef) -> Option<Rating> {
     static STARS_PREFIX: &'static str = "sstars";
     elem.query_selector(".starsinfo").map(|e| {
         let mut result = None;
-        e.each_class(|class| {
+        let attrs = e.attributes.borrow();
+        let classes = attrs.get(local_name!("class")).unwrap();
+        for class in classes.split_whitespace() {
             let (prefix, class_str) = class.split_at(STARS_PREFIX.len());
             if prefix == STARS_PREFIX {
                 let rating = class_str.parse().unwrap();
                 assert!(rating >= 1 && rating <= 10);
                 result = Some(rating);
+                break;
             }
-        });
+        }
         result.unwrap()
     })
 }
