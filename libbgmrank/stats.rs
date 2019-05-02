@@ -55,7 +55,8 @@ impl Histogram {
         )
     }
     pub fn get_stats(&self) -> Stats {
-        let (rated, sum) = self.ratings
+        let (rated, sum) = self
+            .ratings
             .iter()
             .enumerate()
             .skip(1)
@@ -63,13 +64,15 @@ impl Histogram {
                 (count + num, sum + (rating as usize * num))
             });
         let avg = sum as f32 / rated as f32;
-        let var = self.ratings
+        let var = self
+            .ratings
             .iter()
             .enumerate()
             .skip(1)
             .fold(0f32, |sum, (rating, &num)| {
                 sum + num as f32 * (rating as f32 - avg).powf(2.0)
-            }) / rated as f32;
+            })
+            / rated as f32;
         Stats {
             total: rated + self.ratings[0],
             rated: rated,

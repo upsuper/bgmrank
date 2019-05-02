@@ -71,13 +71,9 @@ fn parse_opts(mut matches: Matches) -> Result<Args, String> {
         categories: process_opt_list::<Category>(
             "category",
             matches.opt_strs("c"),
-            Category::Anime
+            Category::Anime,
         )?,
-        states: process_opt_list::<State>(
-            "state",
-            matches.opt_strs("s"),
-            State::Collect
-        )?,
+        states: process_opt_list::<State>("state", matches.opt_strs("s"), State::Collect)?,
     })
 }
 

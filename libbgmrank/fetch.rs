@@ -7,15 +7,17 @@ const ITEMS_PER_PAGE: usize = 24;
 
 fn fetch_page(client: &Client, url: impl IntoUrl) -> Result<NodeRef, hyper::Error> {
     use html5ever::driver::BytesOpts;
-    use html5ever::encoding::EncodingRef;
     use html5ever::encoding::all::UTF_8;
+    use html5ever::encoding::EncodingRef;
     use html5ever::tendril::TendrilSink;
 
     let mut resp = client.get(url).send()?;
     let opts = BytesOpts {
         transport_layer_encoding: Some(UTF_8 as EncodingRef),
     };
-    Ok(kuchiki::parse_html().from_bytes(opts).read_from(&mut resp)?)
+    Ok(kuchiki::parse_html()
+        .from_bytes(opts)
+        .read_from(&mut resp)?)
 }
 
 pub fn get_items(
