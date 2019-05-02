@@ -1,10 +1,7 @@
-use hyper;
+use crate::data::{Category, Item, State, ToStaticStr};
+use crate::parser;
 use hyper::client::{Client, IntoUrl};
-use kuchiki;
 use kuchiki::NodeRef;
-
-use data::{Category, Item, State, ToStaticStr};
-use parser;
 
 const ITEMS_PER_PAGE: usize = 24;
 

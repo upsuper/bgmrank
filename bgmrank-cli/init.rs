@@ -68,16 +68,16 @@ fn parse_opts(mut matches: Matches) -> Result<Args, String> {
     }
     Ok(Args {
         username: matches.free.remove(0),
-        categories: try!(process_opt_list::<Category>(
+        categories: process_opt_list::<Category>(
             "category",
             matches.opt_strs("c"),
             Category::Anime
-        )),
-        states: try!(process_opt_list::<State>(
+        )?,
+        states: process_opt_list::<State>(
             "state",
             matches.opt_strs("s"),
             State::Collect
-        )),
+        )?,
     })
 }
 

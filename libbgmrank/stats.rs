@@ -1,11 +1,10 @@
+use crate::classifier;
+use crate::data::{Item, Rating, MAX_RATING};
 use std::cmp::{Ordering, PartialOrd};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::iter::FromIterator;
 use std::ops::{Index, IndexMut};
-
-use classifier;
-use data::{Item, Rating, MAX_RATING};
 
 #[derive(PartialEq)]
 pub struct Interval {
@@ -151,7 +150,7 @@ pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
 #[cfg(test)]
 mod test {
     use super::Histogram;
-    use data::Item;
+    use crate::data::Item;
     use float_cmp::ApproxEqUlps;
 
     macro_rules! item_with_rating {

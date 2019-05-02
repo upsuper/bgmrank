@@ -1,10 +1,6 @@
-extern crate enum_set;
-extern crate getopts;
-extern crate libbgmrank;
+use libbgmrank::{Histogram, Item, MAX_RATING};
 
 mod init;
-
-use libbgmrank::{Histogram, Item, MAX_RATING};
 
 fn get_all_items(args: &init::Args) -> Vec<Item> {
     let mut result = vec![];

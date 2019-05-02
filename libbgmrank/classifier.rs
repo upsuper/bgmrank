@@ -1,4 +1,4 @@
-use data::Item;
+use crate::data::Item;
 use std::collections::HashMap;
 
 fn normalize_tag(tag: &str) -> String {

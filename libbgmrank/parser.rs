@@ -1,8 +1,8 @@
+use crate::data::{Id, Item, Rating};
+use crate::helpers::{ElementDataRef, QuerySelector};
+use html5ever_atoms::{local_name, namespace_url, ns, qualname};
 use kuchiki::NodeRef;
 use selectors::Element;
-
-use data::{Id, Item, Rating};
-use helpers::{ElementDataRef, QuerySelector};
 
 fn get_item_id(elem: &ElementDataRef) -> Id {
     static ID_PREFIX: &'static str = "item_";
