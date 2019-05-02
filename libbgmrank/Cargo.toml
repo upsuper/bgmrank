@@ -14,7 +14,6 @@ path = "lib.rs"
 
 [dependencies]
 enum-set = "0.0.8"
-selectors = "0.20.0"
 html5ever = "0.22.8"
 kuchiki = "0.7.2"
 

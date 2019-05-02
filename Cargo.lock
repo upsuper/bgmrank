@@ -518,7 +518,6 @@ dependencies = [
  "html5ever 0.22.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "kuchiki 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.9.16 (registry+https://github.com/rust-lang/crates.io-index)",
- "selectors 0.20.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
