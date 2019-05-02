@@ -23,21 +23,21 @@ fn get_item_title(elem: &ElementDataRef) -> String {
 
 fn get_item_rating(elem: &ElementDataRef) -> Option<Rating> {
     static STARS_PREFIX: &'static str = "sstars";
-    elem.query_selector(".starsinfo").map(|e| {
-        let mut result = None;
-        let attrs = e.attributes.borrow();
-        let classes = attrs.get(local_name!("class")).unwrap();
-        for class in classes.split_whitespace() {
-            let (prefix, class_str) = class.split_at(STARS_PREFIX.len());
-            if prefix == STARS_PREFIX {
-                let rating = class_str.parse().unwrap();
-                assert!(rating >= 1 && rating <= 10);
-                result = Some(rating);
-                break;
+    let elem = elem.query_selector(".starsinfo")?;
+    let attrs = elem.attributes.borrow();
+    let classes = attrs.get(local_name!("class")).unwrap();
+    let result = classes
+        .split_whitespace()
+        .find_map(|class| {
+            if !class.starts_with(STARS_PREFIX) {
+                return None;
             }
-        }
-        result.unwrap()
-    })
+            let rating = class[STARS_PREFIX.len()..].parse().unwrap();
+            assert!(rating >= 1 && rating <= 10);
+            Some(rating)
+        })
+        .unwrap();
+    Some(result)
 }
 
 fn get_item_tags(elem: &ElementDataRef) -> Vec<String> {
