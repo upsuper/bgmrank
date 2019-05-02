@@ -1,16 +1,18 @@
 use crate::data::{Category, Item, State, ToStaticStr};
 use crate::parser;
-use hyper::client::{Client, IntoUrl};
 use kuchiki::NodeRef;
+use reqwest::Client;
+use std::error::Error;
 
 const ITEMS_PER_PAGE: usize = 24;
 
-fn fetch_page(client: &Client, url: impl IntoUrl) -> Result<NodeRef, hyper::Error> {
+fn fetch_page(client: &Client, url: &str) -> Result<NodeRef, Box<dyn Error>> {
     use html5ever::driver::BytesOpts;
     use html5ever::encoding::all::UTF_8;
     use html5ever::encoding::EncodingRef;
     use html5ever::tendril::TendrilSink;
 
+    client.get(url).send()?;
     let mut resp = client.get(url).send()?;
     let opts = BytesOpts {
         transport_layer_encoding: Some(UTF_8 as EncodingRef),
@@ -26,12 +28,9 @@ pub fn get_items(
     state: State,
     callback: impl Fn(usize),
 ) -> Vec<Item> {
-    use hyper::net::HttpsConnector;
-    use hyper_rustls::TlsClient;
-
     let category_str = category.to_static_str();
     let state_str = state.to_static_str();
-    let client = Client::with_connector(HttpsConnector::new(TlsClient::new()));
+    let client = Client::new();
     let mut result = vec![];
     for page in 1.. {
         callback(page);
