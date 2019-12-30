@@ -22,8 +22,8 @@ fn get_item_title(elem: &ElementDataRef) -> String {
 }
 
 fn get_item_rating(elem: &ElementDataRef) -> Option<Rating> {
-    static STARS_PREFIX: &'static str = "sstars";
-    let elem = elem.query_selector(".starsinfo")?;
+    static STARS_PREFIX: &'static str = "stars";
+    let elem = elem.query_selector(".starlight")?;
     let attrs = elem.attributes.borrow();
     let classes = attrs.get(local_name!("class")).unwrap();
     let result = classes
