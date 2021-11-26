@@ -13,8 +13,8 @@ name = "libbgmrank"
 path = "lib.rs"
 
 [dependencies]
-html5ever = "0.22.8"
-kuchiki = "0.7.2"
+html5ever = "0.25"
+kuchiki = "0.8"
 strum = { version = "0.23", features = ["derive"] }
 enumset = "1"
 
