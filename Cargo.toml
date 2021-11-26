@@ -1,2 +1,2 @@
 [workspace]
-members = ["libbgmrank", "bgmrank-cli"]
+members = ["libbgmrank", "bgmrank-cli", "bgmrankdiff"]

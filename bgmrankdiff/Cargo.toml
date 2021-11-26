@@ -1,0 +1,20 @@
+[package]
+name = "bgmrankdiff"
+version = "0.1.0"
+authors = ["Xidorn Quan <me@upsuper.org>"]
+description = "Command line tool of comparing personal rank between accounts on Bangumi"
+repository = "https://github.com/upsuper/bgmrank"
+license = "MIT"
+keywords = ["bangumi"]
+edition = "2021"
+
+[[bin]]
+name = "bgmrankdiff"
+path = "main.rs"
+
+[dependencies]
+colored = "2"
+either = "1"
+libbgmrank = { path = "../libbgmrank", version = "0.0.1" }
+structopt = "0.3"
+unicode-width = "0.1"
