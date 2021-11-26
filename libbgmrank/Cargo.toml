@@ -24,4 +24,4 @@ default-features = false
 features = ["rustls-tls"]
 
 [dev-dependencies]
-float-cmp = "0.4.0"
+float-cmp = "0.9"
