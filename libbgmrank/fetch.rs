@@ -1,4 +1,4 @@
-use crate::data::{Category, Item, State, ToStaticStr};
+use crate::data::{Category, Item, State};
 use crate::parser;
 use html5ever::tendril::stream::TendrilSink;
 use kuchiki::NodeRef;
@@ -19,8 +19,8 @@ pub fn get_items(
     state: State,
     callback: impl Fn(usize),
 ) -> Vec<Item> {
-    let category_str = category.to_static_str();
-    let state_str = state.to_static_str();
+    let category_str: &str = category.into();
+    let state_str: &str = state.into();
     let client = Client::new();
     let mut result = vec![];
     for page in 1.. {

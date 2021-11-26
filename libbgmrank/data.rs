@@ -1,83 +1,24 @@
-use std;
-use std::fmt;
-use std::str::FromStr;
+use enumset::EnumSetType;
+use strum::{Display, EnumIter, EnumString, IntoStaticStr};
 
-use enum_set::CLike;
-
-pub trait ToStaticStr {
-    fn to_static_str(&self) -> &'static str;
+#[derive(Display, EnumIter, EnumSetType, EnumString, IntoStaticStr)]
+#[strum(serialize_all = "snake_case")]
+pub enum Category {
+    Anime,
+    Book,
+    Music,
+    Game,
+    Real,
 }
 
-pub trait ListAll: Sized {
-    fn list_all() -> &'static [Self];
-}
-
-macro_rules! static_str_enum {
-    (
-        $name:ident {
-            $($item:ident => $str:ident),*
-        }
-    ) => {
-        #[derive(Clone, Copy)]
-        #[repr(u32)]
-        pub enum $name {
-            $($item),*
-        }
-        impl ToStaticStr for $name {
-            fn to_static_str(&self) -> &'static str {
-                match self {
-                    $($name::$item => stringify!($str)),*
-                }
-            }
-        }
-        impl fmt::Display for $name {
-            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                f.write_str(self.to_static_str())
-            }
-        }
-        impl ListAll for $name {
-            fn list_all() -> &'static [Self] {
-                static LIST: &'static [$name] = &[$($name::$item),+];
-                &LIST
-            }
-        }
-        impl FromStr for $name {
-            type Err = ();
-            fn from_str(s: &str) -> Result<Self, Self::Err> {
-                match s {
-                    $(stringify!($str) => Ok($name::$item)),*,
-                    _ => Err(())
-                }
-            }
-        }
-        impl CLike for $name {
-            fn to_u32(&self) -> u32 {
-                *self as u32
-            }
-            unsafe fn from_u32(v: u32) -> $name {
-                std::mem::transmute(v)
-            }
-        }
-    }
-}
-
-static_str_enum! {
-    Category {
-        Anime => anime,
-        Book => book,
-        Music => music,
-        Game => game,
-        Real => real
-    }
-}
-static_str_enum! {
-    State {
-        Wish => wish,
-        Collect => collect,
-        Do => do,
-        OnHold => on_hold,
-        Dropped => dropped
-    }
+#[derive(Display, EnumIter, EnumSetType, EnumString, IntoStaticStr)]
+#[strum(serialize_all = "snake_case")]
+pub enum State {
+    Wish,
+    Collect,
+    Do,
+    OnHold,
+    Dropped,
 }
 
 pub type Id = u32;

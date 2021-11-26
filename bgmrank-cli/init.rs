@@ -1,18 +1,17 @@
-use std;
-use std::str::FromStr;
-
-use enum_set::{CLike, EnumSet};
+use enumset::{EnumSet, EnumSetType};
 use getopts::{Matches, Options};
+use std::str::FromStr;
+use strum::IntoEnumIterator;
 
-use libbgmrank::{Category, ListAll, State, ToStaticStr};
+use libbgmrank::{Category, State};
 
 fn get_args() -> (String, Vec<String>) {
     let mut args = std::env::args();
     (args.next().unwrap(), args.collect())
 }
 
-fn list_enum_str<E: 'static + ListAll + ToStaticStr>() -> Vec<&'static str> {
-    E::list_all().iter().map(|e| e.to_static_str()).collect()
+fn list_enum_str<E: 'static + IntoEnumIterator + Into<&'static str>>() -> Vec<&'static str> {
+    E::iter().map(|e| e.into()).collect()
 }
 
 fn get_opts() -> Options {
@@ -40,7 +39,7 @@ pub struct Args {
     pub states: EnumSet<State>,
 }
 
-fn process_opt_list<E: ToStaticStr + FromStr + CLike>(
+fn process_opt_list<E: EnumSetType + FromStr + Into<&'static str>>(
     name: &'static str,
     item_list: Vec<String>,
     default_value: E,
