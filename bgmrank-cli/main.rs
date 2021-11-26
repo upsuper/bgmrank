@@ -17,12 +17,8 @@ fn get_all_items(args: &init::Args) -> Vec<Item> {
             ));
         }
     }
-    println!("");
+    println!();
     result
-}
-
-fn generate_bar(width: usize) -> String {
-    std::iter::repeat('#').take(width).collect()
 }
 
 const MAX_COL_WIDTH: usize = 70;
@@ -38,14 +34,14 @@ fn main() {
             tag_stats.stats.rating, tag_stats.tag, tag_stats.stats.rated, tag_stats.stats.total
         );
     }
-    println!("");
+    println!();
 
     let (_, max_rated) = hist.get_max_rated();
     let stats = hist.get_stats();
     for rating in 1..(MAX_RATING + 1) {
         let rated = hist[Some(rating)];
         let num = (rated as f32 / max_rated as f32 * MAX_COL_WIDTH as f32).round() as usize;
-        let bar = generate_bar(num) + if num > 0 { " " } else { "" };
+        let bar = "#".repeat(num) + if num > 0 { " " } else { "" };
         println!("{:>2}: {}{}", rating, bar, rated);
     }
     println!("rated: {}/{}", stats.rated, stats.total);

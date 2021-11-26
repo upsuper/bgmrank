@@ -75,9 +75,9 @@ impl Histogram {
             / rated as f32;
         Stats {
             total: rated + self.ratings[0],
-            rated: rated,
+            rated,
             rating: Interval {
-                avg: avg,
+                avg,
                 stdev: var.sqrt(),
             },
         }
@@ -101,7 +101,7 @@ impl<'a> FromIterator<&'a Item> for Histogram {
 
 impl Index<Option<Rating>> for Histogram {
     type Output = usize;
-    fn index<'a>(&'a self, rating: Option<Rating>) -> &'a Self::Output {
+    fn index(&self, rating: Option<Rating>) -> &Self::Output {
         match rating {
             Some(rating) => &self.ratings[rating as usize],
             None => &self.ratings[0],
@@ -110,7 +110,7 @@ impl Index<Option<Rating>> for Histogram {
 }
 
 impl IndexMut<Option<Rating>> for Histogram {
-    fn index_mut<'a>(&'a mut self, rating: Option<Rating>) -> &'a mut Self::Output {
+    fn index_mut(&mut self, rating: Option<Rating>) -> &mut Self::Output {
         match rating {
             Some(val) => &mut self.ratings[val as usize],
             None => &mut self.ratings[0],
@@ -123,7 +123,7 @@ pub struct TagStats {
     pub stats: Stats,
 }
 
-pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
+pub fn generate_tag_stats(all_items: &[Item]) -> Vec<TagStats> {
     let mut result: Vec<TagStats> = classifier::classify_by_tags(all_items)
         .into_iter()
         .filter_map(|(tag, items)| {
@@ -132,10 +132,7 @@ pub fn generate_tag_stats(all_items: &Vec<Item>) -> Vec<TagStats> {
             if stats.rating.is_nan() {
                 return None;
             }
-            Some(TagStats {
-                tag: tag,
-                stats: stats,
-            })
+            Some(TagStats { tag, stats })
         })
         .collect();
     result.sort_by(|l, r| {

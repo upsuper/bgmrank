@@ -81,13 +81,12 @@ struct PadTitle<'a>(&'a str);
 impl<'a> fmt::Display for PadTitle<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let width = self.0.width();
+        f.write_str(self.0)?;
         if width <= TITLE_WIDTH {
-            f.write_str(self.0)?;
             for _ in 0..TITLE_WIDTH - width {
                 f.write_str(" ")?;
             }
         } else {
-            f.write_str(self.0)?;
             f.write_str("\n")?;
             // Extra 2 characters for the leading symbol
             for _ in 0..TITLE_WIDTH + 2 {

@@ -4,7 +4,7 @@ use html5ever::{expanded_name, local_name, namespace_url, ns};
 use kuchiki::NodeRef;
 
 fn get_item_id(elem: &ElementDataRef) -> Id {
-    static ID_PREFIX: &'static str = "item_";
+    static ID_PREFIX: &str = "item_";
     let attrs = elem.attributes.borrow();
     let id = attrs.get(local_name!("id")).unwrap();
     let (prefix, id_str) = id.split_at(ID_PREFIX.len());
@@ -22,7 +22,7 @@ fn get_item_title(elem: &ElementDataRef) -> String {
 }
 
 fn get_item_rating(elem: &ElementDataRef) -> Option<Rating> {
-    static STARS_PREFIX: &'static str = "stars";
+    static STARS_PREFIX: &str = "stars";
     let elem = elem.query_selector(".starlight")?;
     let attrs = elem.attributes.borrow();
     let classes = attrs.get(local_name!("class")).unwrap();
@@ -33,7 +33,7 @@ fn get_item_rating(elem: &ElementDataRef) -> Option<Rating> {
                 return None;
             }
             let rating = class[STARS_PREFIX.len()..].parse().unwrap();
-            assert!(rating >= 1 && rating <= 10);
+            assert!((1..=10).contains(&rating));
             Some(rating)
         })
         .unwrap();
@@ -41,13 +41,13 @@ fn get_item_rating(elem: &ElementDataRef) -> Option<Rating> {
 }
 
 fn get_item_tags(elem: &ElementDataRef) -> Vec<String> {
-    static TAGS_PREFIX: &'static str = "标签: ";
+    static TAGS_PREFIX: &str = "标签: ";
     if let Some(tags_elem) = elem.query_selector(".collectInfo>.tip") {
         let all_text = tags_elem.text_contents();
         let tag_text = all_text.trim();
         assert!(tag_text.starts_with(TAGS_PREFIX));
         tag_text[TAGS_PREFIX.len()..]
-            .split(" ")
+            .split(' ')
             .filter_map(|s| {
                 if !s.is_empty() {
                     Some(s.to_string())
