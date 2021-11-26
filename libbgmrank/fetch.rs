@@ -2,7 +2,7 @@ use crate::data::{Category, Item, State};
 use crate::parser;
 use html5ever::tendril::stream::TendrilSink;
 use kuchiki::NodeRef;
-use reqwest::Client;
+use reqwest::blocking::Client;
 use std::error::Error;
 
 const ITEMS_PER_PAGE: usize = 24;
