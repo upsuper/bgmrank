@@ -13,8 +13,8 @@ name = "bgmrankdiff"
 path = "main.rs"
 
 [dependencies]
+clap = { version = "4", features = ["derive"] }
 colored = "2"
 either = "1"
 libbgmrank = { path = "../libbgmrank", version = "0.0.1" }
-structopt = "0.3"
 unicode-width = "0.1"

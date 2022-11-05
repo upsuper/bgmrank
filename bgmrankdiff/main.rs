@@ -1,21 +1,21 @@
+use clap::Parser;
 use colored::Colorize;
 use either::Either;
 use libbgmrank::{Category, Rating, State};
 use std::collections::HashMap;
 use std::fmt;
-use structopt::StructOpt;
 use unicode_width::UnicodeWidthStr;
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 struct Opts {
-    #[structopt(name = "USER1")]
+    #[arg(name = "USER1")]
     user1: String,
-    #[structopt(name = "USER2")]
+    #[arg(name = "USER2")]
     user2: String,
 }
 
 fn main() {
-    let opts = Opts::from_args();
+    let opts = Opts::parse();
     println!("fetching {}:", &opts.user1);
     let items1 = libbgmrank::get_items(&opts.user1, Category::Anime, State::Collect, |page| {
         println!("  fetching page {}...", page);
