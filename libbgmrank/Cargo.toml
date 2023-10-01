@@ -6,7 +6,7 @@ description = "Personal rank statistics for Bangumi"
 repository = "https://github.com/upsuper/bgmrank"
 license = "MIT"
 keywords = ["bangumi"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "libbgmrank"

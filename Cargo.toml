@@ -1,2 +1,3 @@
 [workspace]
 members = ["libbgmrank", "bgmrank-cli", "bgmrankdiff"]
+resolver = "2"
