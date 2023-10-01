@@ -15,7 +15,7 @@ path = "lib.rs"
 [dependencies]
 html5ever = "0.25"
 kuchiki = "0.8"
-strum = { version = "0.23", features = ["derive"] }
+strum = { version = "0.25", features = ["derive"] }
 enumset = "1"
 
 [dependencies.reqwest]

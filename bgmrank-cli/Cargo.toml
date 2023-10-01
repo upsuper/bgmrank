@@ -16,4 +16,4 @@ path = "main.rs"
 enumset = "1"
 getopts = "0.2"
 libbgmrank = { path = "../libbgmrank", version = "0.0.1" }
-strum = "0.23"
+strum = "0.25"
